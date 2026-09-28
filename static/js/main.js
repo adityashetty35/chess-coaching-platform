@@ -24,6 +24,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const siteNav = document.querySelector('.site-nav');
+    if (siteNav) {
+        const onScroll = () => siteNav.classList.toggle('scrolled', window.scrollY > 8);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    const reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '0px 0px -10% 0px' });
+        reveals.forEach(el => io.observe(el));
+    } else {
+        reveals.forEach(el => el.classList.add('in'));
+    }
+
     document.querySelectorAll('.alert-dismissible').forEach(alert => {
         setTimeout(() => {
             if (window.bootstrap && bootstrap.Alert) {

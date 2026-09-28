@@ -61,6 +61,7 @@ def enquiry_form(request, pk=None):
     return render(request, 'enquiries/form.html', {
         'form': form,
         'enquiry': enquiry,
+        'back_url': 'enquiries:list',
     })
 
 

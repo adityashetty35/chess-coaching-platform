@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg site-nav sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'website:home' %}">
+            <span class="brand-mark">♚</span>
+            <span>{{ site_settings.academy_name|default:"Chess Academy" }}</span>
+        </a>
+        {% if not minimal_nav %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNav" aria-label="Toggle navigation">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="siteNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'website:home' %}#about">Coach</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'website:home' %}#programs">Programs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'website:home' %}#method">Method</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'website:home' %}#reviews">Reviews</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'website:home' %}#faq">FAQ</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2 py-2 py-lg-0">
+                <a href="{% url 'accounts:login' %}" class="nav-link px-2">Log in</a>
+                <a href="{% url 'website:enquiry' %}" class="btn btn-primary btn-sm">Book a free trial</a>
+            </div>
+        </div>
+        {% else %}
+        <a href="{% url 'website:home' %}" class="link-arrow text-sm"><i class="bi bi-arrow-left"></i>Back to site</a>
+        {% endif %}
+    </div>
+</nav>

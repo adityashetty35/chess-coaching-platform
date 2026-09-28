@@ -1,0 +1,17 @@
+<footer class="site-footer">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
+        <span>&copy; {% now "Y" %} {{ site_settings.academy_name|default:"Chess Academy" }}</span>
+        <div class="d-flex gap-4">
+            {% if site_settings.instagram_url %}<a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+            {% if site_settings.youtube_url %}<a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener">YouTube</a>{% endif %}
+            {% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
+            <a href="{% url 'accounts:login' %}">Student &amp; parent portal</a>
+        </div>
+    </div>
+</footer>
+
+{% if site_settings.whatsapp_digits %}
+<a href="https://wa.me/{{ site_settings.whatsapp_digits }}" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+</a>
+{% endif %}

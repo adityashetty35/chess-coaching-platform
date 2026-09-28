@@ -5,38 +5,39 @@
 {% block body_class %}portal-layout{% endblock %}
 
 {% block body %}
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+{% with current=request.resolver_match.url_name %}
+<nav class="navbar navbar-expand-lg portal-nav sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{% url 'portal:dashboard' %}">
-            <span class="text-primary">♔</span> {{ site_settings.academy_name|default:"Chess Academy" }}
+        <a class="navbar-brand" href="{% url 'portal:dashboard' %}">
+            <span class="me-1">♔</span> {{ site_settings.academy_name|default:"Chess Academy" }}
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#portalNav">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#portalNav">
+            <i class="bi bi-list fs-3"></i>
         </button>
         <div class="collapse navbar-collapse" id="portalNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav mx-auto gap-lg-1">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:dashboard' %}"><i class="bi bi-grid me-1"></i>Dashboard</a>
+                    <a class="nav-link{% if current == 'dashboard' %} active{% endif %}" href="{% url 'portal:dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:classes' %}"><i class="bi bi-calendar me-1"></i>Classes</a>
+                    <a class="nav-link{% if current == 'classes' %} active{% endif %}" href="{% url 'portal:classes' %}">Classes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:attendance' %}"><i class="bi bi-check2-square me-1"></i>Attendance</a>
+                    <a class="nav-link{% if current == 'attendance' %} active{% endif %}" href="{% url 'portal:attendance' %}">Attendance</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:homework' %}"><i class="bi bi-journal me-1"></i>Homework</a>
+                    <a class="nav-link{% if current == 'homework' %} active{% endif %}" href="{% url 'portal:homework' %}">Homework</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:progress' %}"><i class="bi bi-graph-up me-1"></i>Progress</a>
+                    <a class="nav-link{% if current == 'progress' %} active{% endif %}" href="{% url 'portal:progress' %}">Progress</a>
                 </li>
                 {% if request.user.parent_profile %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:fees' %}"><i class="bi bi-currency-rupee me-1"></i>Fees</a>
+                    <a class="nav-link{% if current == 'fees' %} active{% endif %}" href="{% url 'portal:fees' %}">Fees</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'portal:announcements' %}"><i class="bi bi-megaphone me-1"></i>Announcements</a>
+                    <a class="nav-link{% if current == 'announcements' %} active{% endif %}" href="{% url 'portal:announcements' %}">Announcements</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
@@ -45,17 +46,18 @@
                         <i class="bi bi-person-circle me-1"></i>{{ request.user.get_full_name|default:request.user.username }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'password_change' %}"><i class="bi bi-key me-2"></i>Change Password</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}"><i class="bi bi-key me-2"></i>Change Password</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Log out</button></form></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+{% endwith %}
 
-<main class="container py-4">
+<main class="container py-5 flex-grow-1">
     {% if messages %}
     {% for message in messages %}
     <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
@@ -68,9 +70,9 @@
     {% block content %}{% endblock %}
 </main>
 
-<footer class="bg-light py-3 mt-auto">
+<footer class="portal-footer py-4">
     <div class="container text-center text-muted small">
-        &copy; {{ site_settings.academy_name|default:"Chess Academy" }}
+        &copy; {% now "Y" %} {{ site_settings.academy_name|default:"Chess Academy" }}
     </div>
 </footer>
 {% endblock %}

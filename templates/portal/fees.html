@@ -12,9 +12,9 @@
             <tr>
                 <td>{{ inv.student.full_name }}</td>
                 <td>{{ inv.description }}</td>
-                <td>\u20b9{{ inv.amount|intcomma }}</td>
-                <td>\u20b9{{ inv.amount_paid|intcomma }}</td>
-                <td>\u20b9{{ inv.balance|intcomma }}</td>
+                <td>₹{{ inv.amount|intcomma }}</td>
+                <td>₹{{ inv.amount_paid|intcomma }}</td>
+                <td>₹{{ inv.balance|intcomma }}</td>
                 <td>{{ inv.due_date|date:"d M Y" }}</td>
                 <td><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
             </tr>

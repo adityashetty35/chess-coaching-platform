@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 
+{% block title %}Log in · {{ site_settings.academy_name|default:"Chess Academy" }}{% endblock %}
 {% block body_class %}login-page{% endblock %}
 
 {% block body %}
-<div class="login-card fade-in">
-    <div class="text-center mb-4">
-        <div style="font-size: 48px; margin-bottom: 8px;">♔</div>
-        <h2>Welcome Back</h2>
-        <p class="login-subtitle">Sign in to your account</p>
+<div class="login-card">
+    <div class="text-center mb-2">
+        <div class="login-mark" aria-hidden="true">♔</div>
+        <h2>Welcome back</h2>
+        <p class="login-subtitle">Log in to {{ site_settings.academy_name|default:"your account" }}</p>
     </div>
 
     {% if form.errors %}
     <div class="alert alert-danger py-2" role="alert">
-        <small>Invalid username or password. Please try again.</small>
+        <small>That username and password didn't match. Try again.</small>
     </div>
     {% endif %}
 
@@ -20,13 +21,13 @@
         {% csrf_token %}
         <div class="mb-3">
             <label class="form-label" for="id_username">Username</label>
-            <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" autofocus required>
+            <input type="text" name="username" id="id_username" class="form-control" autocomplete="username" autofocus required>
         </div>
         <div class="mb-4">
             <label class="form-label" for="id_password">Password</label>
-            <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+            <input type="password" name="password" id="id_password" class="form-control" autocomplete="current-password" required>
         </div>
-        <button type="submit" class="btn btn-primary w-100 btn-lg">Sign In</button>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">Log in</button>
         <input type="hidden" name="next" value="{{ next }}">
     </form>
 

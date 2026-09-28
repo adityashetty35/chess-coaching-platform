@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 
 class SiteSettings(models.Model):
@@ -49,6 +51,19 @@ class SiteSettings(models.Model):
     def __str__(self):
         return self.academy_name
 
+    @property
+    def whatsapp_digits(self):
+        # wa.me links only accept digits, e.g. "+91 98765-43210" -> "919876543210"
+        return ''.join(ch for ch in self.whatsapp if ch.isdigit())
+
+    @property
+    def how_it_works_steps(self):
+        try:
+            steps = json.loads(self.how_it_works or '[]')
+        except ValueError:
+            return []
+        return [s for s in steps if isinstance(s, dict) and s.get('title')]
+
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
@@ -92,6 +107,10 @@ class CoachingProgram(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def feature_list(self):
+        return [line.strip() for line in self.features.splitlines() if line.strip()]
 
 
 class Testimonial(models.Model):

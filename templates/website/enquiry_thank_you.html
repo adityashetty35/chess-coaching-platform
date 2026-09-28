@@ -1,22 +1,17 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Thank You{% endblock %}
+{% block title %}Thank you · {{ site_settings.academy_name|default:"Chess Academy" }}{% endblock %}
+{% block body_class %}site{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'website:home' %}">
-            {{ site_settings.academy_name|default:"Chess Academy" }}
-        </a>
-    </div>
-</nav>
+{% include "website/_nav.html" with minimal_nav=True %}
 
-<div class="container py-5 text-center" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
-    <div>
-        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
-        <h1 class="mt-4 mb-3">Thank You!</h1>
-        <p class="lead text-muted mb-4">Your enquiry has been successfully submitted. We will get back to you shortly.</p>
-        <a href="{% url 'website:home' %}" class="btn btn-primary">Return to Home</a>
-    </div>
+<div class="page-narrow text-center" style="min-height: 60vh; display: flex; flex-direction: column; justify-content: center;">
+    <div class="display mb-3" aria-hidden="true">♔</div>
+    <h1 class="section-title">Thank you</h1>
+    <p class="section-desc mx-auto mb-5" style="max-width: 28rem;">Your enquiry is in. We'll be in touch shortly to arrange a trial session.</p>
+    <div><a href="{% url 'website:home' %}" class="btn btn-outline-primary">Back to home</a></div>
 </div>
+
+{% include "website/_footer.html" %}
 {% endblock %}

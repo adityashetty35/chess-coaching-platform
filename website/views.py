@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db.models import Avg
 from core.models import SiteSettings, CoachingService, CoachingProgram, Testimonial, FAQ, Achievement
 from .forms import PublicEnquiryForm
 
@@ -37,6 +38,8 @@ def home(request):
         context['achievements'] = Achievement.objects.filter(is_active=True)
     except:
         context['achievements'] = Achievement.objects.all()
+
+    context['avg_rating'] = context['testimonials'].aggregate(avg=Avg('rating'))['avg']
 
     return render(request, 'website/home.html', context)
 

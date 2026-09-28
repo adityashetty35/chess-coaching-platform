@@ -19,9 +19,9 @@
     </form>
 </div>
 <div class="row g-3 mb-4">
-    <div class="col-md-4"><div class="stat-card stat-primary"><div class="stat-value">\u20b9{{ total_amount|intcomma }}</div><div class="stat-label">Total Invoiced</div></div></div>
-    <div class="col-md-4"><div class="stat-card stat-success"><div class="stat-value">\u20b9{{ total_paid|intcomma }}</div><div class="stat-label">Total Collected</div></div></div>
-    <div class="col-md-4"><div class="stat-card stat-warning"><div class="stat-value">\u20b9{{ total_pending|intcomma }}</div><div class="stat-label">Pending</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-primary"><div class="stat-value">₹{{ total_amount|intcomma }}</div><div class="stat-label">Total Invoiced</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-success"><div class="stat-value">₹{{ total_paid|intcomma }}</div><div class="stat-label">Total Collected</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-warning"><div class="stat-value">₹{{ total_pending|intcomma }}</div><div class="stat-label">Pending</div></div></div>
 </div>
 <div class="card">
     <div class="card-header">Invoices</div>
@@ -33,9 +33,9 @@
             <tr>
                 <td class="fw-500">{{ inv.student.full_name }}</td>
                 <td>{{ inv.description }}</td>
-                <td>\u20b9{{ inv.amount|intcomma }}</td>
-                <td>\u20b9{{ inv.amount_paid|intcomma }}</td>
-                <td>\u20b9{{ inv.balance|intcomma }}</td>
+                <td>₹{{ inv.amount|intcomma }}</td>
+                <td>₹{{ inv.amount_paid|intcomma }}</td>
+                <td>₹{{ inv.balance|intcomma }}</td>
                 <td>{{ inv.due_date|date:"d M Y" }}</td>
                 <td><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
             </tr>
