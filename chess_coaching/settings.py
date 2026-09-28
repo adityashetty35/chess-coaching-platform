@@ -8,6 +8,12 @@ SECRET_KEY = 'django-insecure-ch3ss-c0ach1ng-change-this-in-production-k3y!'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.pythonanywhere.com',
+    'http://*.pythonanywhere.com',
+    'http://127.0.0.1',
+    'http://localhost',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
