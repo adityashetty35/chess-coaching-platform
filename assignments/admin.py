@@ -11,4 +11,4 @@ class AssignmentAdmin(admin.ModelAdmin):
 class AssignmentSubmissionAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'student', 'status')
     list_filter = ('status',)
-    search_fields = ('assignment__title', 'student__first_name', 'student__last_name')
+    search_fields = ('assignment__title', 'student__user__first_name')

@@ -2,7 +2,7 @@
 {% block page_title %}{{ title }}{% endblock %}
 {% block page_actions %}
 <a href="{% url 'announcements:list' %}" class="btn btn-outline-secondary btn-sm me-2">Back</a>
-<a href="{% url 'announcements:edit' pk=announcement.pk %}" class="btn btn-primary btn-sm">Edit</a>
+<a href="{% url 'announcements:form' pk=announcement.pk %}" class="btn btn-primary btn-sm">Edit</a>
 {% endblock %}
 {% block content %}
 <div class="card">

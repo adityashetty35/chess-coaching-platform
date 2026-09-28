@@ -3,7 +3,7 @@
 {% block page_title %}{{ title }}{% endblock %}
 {% block page_actions %}
 <a href="{% url 'progress:goal_list' student_pk=student.pk %}" class="btn btn-outline-primary btn-sm me-2">View Goals</a>
-<a href="{% url 'progress:add' student_pk=student.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Entry</a>
+<a href="{% url 'progress:form' student_pk=student.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Entry</a>
 {% endblock %}
 {% block content %}
 <div class="row">
@@ -13,7 +13,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ entry.date|date:"F j, Y" }} (Rating: {{ entry.rating|default:"N/A" }})</h5>
                 <div>
-                    <a href="{% url 'progress:edit' student_pk=student.pk pk=entry.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="{% url 'progress:form' student_pk=student.pk pk=entry.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
                     <form method="post" action="{% url 'progress:delete' student_pk=student.pk pk=entry.pk %}" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this entry?');">Delete</button>

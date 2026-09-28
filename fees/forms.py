@@ -39,7 +39,7 @@ class InvoiceForm(BaseFormClass):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['student'].queryset = Student.objects.filter(status='active').order_by('first_name')
+        self.fields['student'].queryset = Student.objects.filter(is_active=True).order_by('user__first_name')
         self.fields['fee_plan'].queryset = FeePlan.objects.filter(is_active=True)
 
 class PaymentForm(BaseFormClass):

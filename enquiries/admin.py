@@ -9,5 +9,5 @@ class EnquiryAdmin(admin.ModelAdmin):
 
 @admin.register(EnquiryFollowUp)
 class EnquiryFollowUpAdmin(admin.ModelAdmin):
-    list_display = ('enquiry', 'created_at', 'next_follow_up')
-    list_filter = ('created_at',)
+    list_display = ('enquiry', 'date', 'status_after')
+    list_filter = ('date', 'status_after')

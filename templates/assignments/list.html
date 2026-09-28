@@ -1,7 +1,7 @@
 {% extends "base_admin.html" %}
 {% load humanize %}
 {% block page_title %}{{ title }}{% endblock %}
-{% block page_actions %}<a href="{% url 'assignments:add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Assignment</a>{% endblock %}
+{% block page_actions %}<a href="{% url 'assignments:form' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Assignment</a>{% endblock %}
 {% block content %}
 <div class="card">
     <div class="table-responsive">
@@ -23,7 +23,7 @@
                         {% if assignment.batch %}{{ assignment.batch }}{% else %}{{ assignment.students.count }} Student(s){% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'assignments:edit' pk=assignment.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a href="{% url 'assignments:form' pk=assignment.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
                         <form method="post" action="{% url 'assignments:delete' pk=assignment.pk %}" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this assignment?');">Delete</button>

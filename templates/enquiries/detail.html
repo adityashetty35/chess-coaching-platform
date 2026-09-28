@@ -7,7 +7,7 @@
     <div class="col-12 d-flex justify-content-between align-items-center">
         <div>
             <a href="{% url 'enquiries:list' %}" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-arrow-left"></i> Back to List</a>
-            <span class="status-badge status-{{ enquiry.status }} fs-6">{{ enquiry.get_status_display }}</span>
+            <span class="badge status-badge status-{{ enquiry.status }} fs-6">{{ enquiry.get_status_display }}</span>
         </div>
         <div class="d-flex gap-2">
             {% if enquiry.status != 'converted' %}
@@ -49,7 +49,7 @@
                 {% endif %}
                 <div class="row mb-3">
                     <div class="col-sm-4 text-muted">Age</div>
-                    <div class="col-sm-8">{{ enquiry.age|default:"-" }} years</div>
+                    <div class="col-sm-8">{{ enquiry.age }} years</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-4 text-muted">Current Level</div>
@@ -65,12 +65,6 @@
                     <div class="col-sm-4 text-muted">Preferred Mode</div>
                     <div class="col-sm-8">{{ enquiry.get_preferred_mode_display|default:"-" }}</div>
                 </div>
-                {% if enquiry.preferred_schedule %}
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted">Preferred Schedule</div>
-                    <div class="col-sm-8">{{ enquiry.preferred_schedule }}</div>
-                </div>
-                {% endif %}
                 
                 <hr>
                 
@@ -80,7 +74,7 @@
                     <div class="col-sm-8">
                         {{ enquiry.phone }}
                         {% if enquiry.whatsapp %}
-                        <a href="https://wa.me/{{ enquiry.whatsapp|cut:' '|cut:'+' }}" class="ms-2 text-success" target="_blank"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                        <a href="https://wa.me/{{ enquiry.whatsapp|cut:' ' }}" class="ms-2 text-success" target="_blank"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                         {% endif %}
                     </div>
                 </div>
@@ -120,11 +114,11 @@
                     {% csrf_token %}
                     <div class="input-group">
                         <select name="status" class="form-select">
-                            {% for code, name in status_choices %}
+                            {% for code, name in enquiry._meta.get_field('status').choices %}
                                 <option value="{{ code }}" {% if enquiry.status == code %}selected{% endif %}>{{ name }}</option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-outline-primary">Update</button>
                     </div>
                 </form>
             </div>
@@ -139,12 +133,17 @@
                 <form method="post" action="{% url 'enquiries:add_follow_up' enquiry.pk %}" class="mb-4">
                     {% csrf_token %}
                     <div class="mb-2">
-                        <label class="form-label small text-muted">Notes</label>
                         {{ follow_up_form.notes }}
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label small text-muted">Next Follow-up Date</label>
-                        {{ follow_up_form.next_follow_up }}
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small text-muted">Next Follow-up</label>
+                            {{ follow_up_form.follow_up_date }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small text-muted">Status After</label>
+                            {{ follow_up_form.status_after }}
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-sm btn-primary w-100">Add Note</button>
                 </form>
@@ -154,10 +153,13 @@
                     <div class="timeline-item mb-3 pb-3 border-bottom">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <small class="text-muted">{{ note.created_at|date:"M d, Y h:i A" }}</small>
+                            {% if note.status_after %}
+                                <span class="badge bg-secondary rounded-pill" style="font-size: 0.7em;">{{ note.get_status_after_display }}</span>
+                            {% endif %}
                         </div>
                         <div class="mb-1">{{ note.notes|linebreaksbr }}</div>
-                        {% if note.next_follow_up %}
-                            <small class="text-primary"><i class="bi bi-calendar-event"></i> Next: {{ note.next_follow_up|date:"M d, Y" }}</small>
+                        {% if note.follow_up_date %}
+                            <small class="text-primary"><i class="bi bi-calendar-event"></i> Next: {{ note.follow_up_date|date:"M d, Y" }}</small>
                         {% endif %}
                     </div>
                     {% empty %}
@@ -191,4 +193,17 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-badge { padding: 0.4em 0.8em; font-weight: 500; }
+    .status-new { background-color: #e9ecef; color: #495057; }
+    .status-contacted { background-color: #cff4fc; color: #055160; }
+    .status-trial_scheduled { background-color: #fff3cd; color: #664d03; }
+    .status-trial_completed { background-color: #cfe2ff; color: #084298; }
+    .status-converted { background-color: #d1e7dd; color: #0f5132; }
+    .status-lost { background-color: #f8d7da; color: #842029; }
+</style>
 {% endblock %}
