@@ -58,7 +58,7 @@ def invoice_list(request):
     if search_query:
         invoices = invoices.filter(description__icontains=search_query)
 
-    students = Student.objects.filter(is_active=True).order_by('user__first_name')
+    students = Student.objects.filter(status='active').order_by('first_name')
     return render(request, 'fees/invoice_list.html', {
         'items': invoices,
         'students': students,
