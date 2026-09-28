@@ -1,0 +1,59 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'progress:goal_list' student_pk=student.pk %}" class="btn btn-outline-primary btn-sm me-2">View Goals</a>
+<a href="{% url 'progress:add' student_pk=student.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Entry</a>
+{% endblock %}
+{% block content %}
+<div class="row">
+    {% for entry in entries %}
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ entry.date|date:"F j, Y" }} (Rating: {{ entry.rating|default:"N/A" }})</h5>
+                <div>
+                    <a href="{% url 'progress:edit' student_pk=student.pk pk=entry.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <form method="post" action="{% url 'progress:delete' student_pk=student.pk pk=entry.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this entry?');">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Skills (1-10)</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Tactics 
+                                <span class="badge bg-primary rounded-pill">{{ entry.tactics|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Opening 
+                                <span class="badge bg-primary rounded-pill">{{ entry.opening_knowledge|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Middlegame 
+                                <span class="badge bg-primary rounded-pill">{{ entry.middlegame|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Endgame 
+                                <span class="badge bg-primary rounded-pill">{{ entry.endgame|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Calculation 
+                                <span class="badge bg-primary rounded-pill">{{ entry.calculation|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Positional 
+                                <span class="badge bg-primary rounded-pill">{{ entry.positional|default:"-" }}</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Time Management 
+                                <span class="badge bg-primary rounded-pill">{{ entry.time_management|default:"-" }}</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Notes</h6>
+                        {% if entry.strengths %}<p><strong>Strengths:</strong><br>{{ entry.strengths }}</p>{% endif %}
+                        {% if entry.weaknesses %}<p><strong>Weaknesses:</strong><br>{{ entry.weaknesses }}</p>{% endif %}
+                        {% if entry.next_goals %}<p><strong>Next Goals:</strong><br>{{ entry.next_goals }}</p>{% endif %}
+                        {% if entry.coach_comments %}<p><strong>Coach Comments:</strong><br>{{ entry.coach_comments }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="empty-state text-center py-5">No progress entries found.</div></div>
+    {% endfor %}
+</div>
+{% endblock %}

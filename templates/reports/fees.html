@@ -1,0 +1,48 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}Fees Report{% endblock %}
+{% block page_actions %}<a href="{% url 'reports:export_csv' 'fees' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>{% endblock %}
+{% block content %}
+<div class="filter-bar d-flex flex-wrap gap-2 align-items-end mb-3">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label text-xs">From</label><input type="date" name="start" value="{{ filter_start }}" class="form-control form-control-sm"></div>
+        <div><label class="form-label text-xs">To</label><input type="date" name="end" value="{{ filter_end }}" class="form-control form-control-sm"></div>
+        <div><label class="form-label text-xs">Status</label>
+            <select name="status" class="form-select form-select-sm"><option value="">All</option>
+            <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="partially_paid" {% if filter_status == 'partially_paid' %}selected{% endif %}>Partial</option>
+            <option value="paid" {% if filter_status == 'paid' %}selected{% endif %}>Paid</option>
+            <option value="overdue" {% if filter_status == 'overdue' %}selected{% endif %}>Overdue</option>
+            </select>
+        </div>
+        <div><button class="btn btn-primary btn-sm">Filter</button></div>
+    </form>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card stat-primary"><div class="stat-value">\u20b9{{ total_amount|intcomma }}</div><div class="stat-label">Total Invoiced</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-success"><div class="stat-value">\u20b9{{ total_paid|intcomma }}</div><div class="stat-label">Total Collected</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-warning"><div class="stat-value">\u20b9{{ total_pending|intcomma }}</div><div class="stat-label">Pending</div></div></div>
+</div>
+<div class="card">
+    <div class="card-header">Invoices</div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Student</th><th>Description</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Due Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td class="fw-500">{{ inv.student.full_name }}</td>
+                <td>{{ inv.description }}</td>
+                <td>\u20b9{{ inv.amount|intcomma }}</td>
+                <td>\u20b9{{ inv.amount_paid|intcomma }}</td>
+                <td>\u20b9{{ inv.balance|intcomma }}</td>
+                <td>{{ inv.due_date|date:"d M Y" }}</td>
+                <td><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No invoices found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

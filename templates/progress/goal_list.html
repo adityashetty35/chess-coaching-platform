@@ -1,0 +1,49 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'progress:list' student_pk=student.pk %}" class="btn btn-outline-secondary btn-sm me-2">Back to Progress</a>
+<a href="{% url 'progress:goal_add' student_pk=student.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Goal</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Goal</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Target Date</th>
+                    <th>Progress</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for goal in goals %}
+                <tr>
+                    <td>{{ goal.title }}</td>
+                    <td><span class="status-badge status-{{ goal.status }}">{{ goal.get_status_display }}</span></td>
+                    <td><span class="status-badge status-{{ goal.priority }}">{{ goal.get_priority_display }}</span></td>
+                    <td>{{ goal.target_date|default:"-" }}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ goal.progress_percent }}%;" aria-valuenow="{{ goal.progress_percent }}" aria-valuemin="0" aria-valuemax="100">{{ goal.progress_percent }}%</div>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'progress:goal_edit' student_pk=student.pk pk=goal.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <form method="post" action="{% url 'progress:goal_delete' student_pk=student.pk pk=goal.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this goal?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center py-4 text-muted empty-state">No goals found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

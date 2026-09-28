@@ -1,0 +1,154 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+
+{% block page_title %}Invoice Details{% endblock %}
+{% block page_actions %}
+<a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-secondary btn-sm">Back to Invoices</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Summary</span>
+                <div>
+                    <a href="{% url 'fees:invoice_edit' invoice.pk %}" class="btn btn-sm btn-outline-primary me-2"><i class="bi bi-pencil me-1"></i>Edit</a>
+                    <form method="post" action="{% url 'fees:invoice_delete' invoice.pk %}" class="d-inline" onsubmit="return confirm('Delete this invoice? This will also delete related payments and reminders.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="text-muted small mb-1">Student</div>
+                        <div class="fw-bold fs-5">{{ invoice.student.full_name }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small mb-1">Description</div>
+                        <div class="fw-bold fs-5">{{ invoice.description }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small mb-1">Due Date</div>
+                        <div class="fw-bold fs-5">{{ invoice.due_date|date:"d M Y" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small mb-1">Status</div>
+                        <div><span class="badge status-badge status-{{ invoice.status }} fs-6">{{ invoice.get_status_display }}</span></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-muted small mb-1">Total Amount</div>
+                        <div class="fw-bold fs-4">{{ site_settings.currency_symbol|default:"₹" }}{{ invoice.amount|intcomma }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small mb-1">Amount Paid</div>
+                        <div class="fw-bold fs-4 text-success">{{ site_settings.currency_symbol|default:"₹" }}{{ invoice.amount_paid|intcomma }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small mb-1">Balance Due</div>
+                        <div class="fw-bold fs-4 text-danger">{{ site_settings.currency_symbol|default:"₹" }}{{ invoice.balance|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light d-flex gap-2">
+                {% if invoice.balance > 0 %}
+                <a href="{% url 'fees:record_payment' invoice.pk %}" class="btn btn-success"><i class="bi bi-cash me-1"></i>Record Payment</a>
+                <a href="{% url 'fees:create_reminder' invoice.pk %}" class="btn btn-primary"><i class="bi bi-bell me-1"></i>Schedule Reminder</a>
+                <a href="{% url 'fees:whatsapp_reminder' invoice.pk %}" target="_blank" class="btn btn-outline-success"><i class="bi bi-whatsapp me-1"></i>Send WhatsApp</a>
+                {% else %}
+                <span class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i>Fully Paid</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <span class="fw-bold">Payment History</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.payment_date|date:"d M Y" }}</td>
+                        <td class="text-success fw-bold">{{ site_settings.currency_symbol|default:"₹" }}{{ payment.amount|intcomma }}</td>
+                        <td>
+                            {{ payment.get_method_display }}
+                            {% if payment.reference %}
+                            <br><small class="text-muted">{{ payment.reference }}</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center py-4 text-muted">No payments recorded.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminders -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <span class="fw-bold">Reminder History</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for reminder in reminders %}
+                    <tr>
+                        <td>{{ reminder.scheduled_date|date:"d M Y" }}</td>
+                        <td>{{ reminder.get_reminder_type_display }}</td>
+                        <td>
+                            {% if reminder.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif reminder.status == 'sent' %}
+                                <span class="badge bg-success">Sent</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reminder.status == 'pending' %}
+                            <form method="post" action="{% url 'fees:cancel_reminder' reminder.pk %}" class="d-inline" onsubmit="return confirm('Cancel this reminder?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Reminder"><i class="bi bi-x-circle"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center py-4 text-muted">No reminders scheduled.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

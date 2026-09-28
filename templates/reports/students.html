@@ -1,0 +1,48 @@
+{% extends "base_admin.html" %}
+{% block page_title %}Students Report{% endblock %}
+{% block page_actions %}<a href="{% url 'reports:export_csv' 'students' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>{% endblock %}
+{% block content %}
+<div class="filter-bar d-flex flex-wrap gap-2 align-items-end mb-3">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label text-xs">Status</label>
+            <select name="status" class="form-select form-select-sm">
+            <option value="">All</option>
+            <option value="active" {% if filter_status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if filter_status == 'inactive' %}selected{% endif %}>Inactive</option>
+            <option value="on_break" {% if filter_status == 'on_break' %}selected{% endif %}>On Break</option>
+            </select>
+        </div>
+        <div><label class="form-label text-xs">Level</label>
+            <select name="level" class="form-select form-select-sm">
+            <option value="">All</option>
+            <option value="beginner" {% if filter_level == 'beginner' %}selected{% endif %}>Beginner</option>
+            <option value="intermediate" {% if filter_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+            <option value="advanced" {% if filter_level == 'advanced' %}selected{% endif %}>Advanced</option>
+            <option value="tournament" {% if filter_level == 'tournament' %}selected{% endif %}>Tournament</option>
+            </select>
+        </div>
+        <div><button class="btn btn-primary btn-sm">Filter</button></div>
+    </form>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Name</th><th>Status</th><th>Level</th><th>Type</th><th>Joining Date</th><th>Phone</th><th>Rating</th></tr></thead>
+            <tbody>
+            {% for s in students %}
+            <tr>
+                <td><a href="{% url 'students:detail' s.pk %}" class="text-decoration-none fw-500">{{ s.full_name }}</a></td>
+                <td><span class="status-badge status-{{ s.status }}">{{ s.get_status_display }}</span></td>
+                <td>{{ s.get_chess_level_display }}</td>
+                <td>{{ s.get_coaching_type_display }}</td>
+                <td>{{ s.joining_date|date:"d M Y" }}</td>
+                <td>{{ s.phone }}</td>
+                <td>{{ s.fide_rating|default:"-" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No students found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

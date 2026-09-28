@@ -1,0 +1,53 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Mark Attendance for {{ chess_class }}</span>
+                <a href="{% url 'coaching:class_detail' chess_class.pk %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body p-0">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Student Name</th>
+                                    <th class="pe-3" style="width: 200px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in student_records %}
+                                <tr>
+                                    <td class="ps-3 align-middle">{{ record.student.full_name }}</td>
+                                    <td class="pe-3">
+                                        <select name="status_{{ record.student.id }}" class="form-select form-select-sm">
+                                            <option value="present" {% if record.status == 'present' %}selected{% endif %}>Present</option>
+                                            <option value="absent" {% if record.status == 'absent' %}selected{% endif %}>Absent</option>
+                                            <option value="late" {% if record.status == 'late' %}selected{% endif %}>Late</option>
+                                            <option value="excused" {% if record.status == 'excused' %}selected{% endif %}>Excused</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center py-4 text-muted">No students to mark attendance for.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if student_records %}
+                    <div class="p-3 bg-light border-top text-end">
+                        <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

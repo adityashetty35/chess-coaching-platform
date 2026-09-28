@@ -1,0 +1,20 @@
+{% extends "base_portal.html" %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+<h4 class="mb-4">Announcements</h4>
+{% for ann in announcements %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+            <h5 class="mb-0">{{ ann.title }}</h5>
+            {% if ann.priority == 'urgent' %}<span class="badge bg-danger">Urgent</span>
+            {% elif ann.priority == 'high' %}<span class="badge bg-warning text-dark">Important</span>{% endif %}
+        </div>
+        <p>{{ ann.content|linebreaks }}</p>
+        <small class="text-muted">{{ ann.publish_date|date:"d M Y, h:i A" }}</small>
+    </div>
+</div>
+{% empty %}
+<div class="text-center py-5 text-muted">No announcements.</div>
+{% endfor %}
+{% endblock %}

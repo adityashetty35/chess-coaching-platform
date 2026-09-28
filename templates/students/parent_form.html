@@ -1,0 +1,73 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ title }}</span>
+                <a href="{{ back_url_str }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.name.label_tag }} {{ form.name }} {{ form.name.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.relationship.label_tag }} {{ form.relationship }} {{ form.relationship.errors }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.phone.label_tag }} {{ form.phone }} {{ form.phone.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.whatsapp.label_tag }} {{ form.whatsapp }} {{ form.whatsapp.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.email.label_tag }} {{ form.email }} {{ form.email.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.preferred_communication.label_tag }} {{ form.preferred_communication }} {{ form.preferred_communication.errors }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12 mb-3">
+                            {{ form.students.label_tag }}
+                            <div class="small text-muted mb-2">Hold Ctrl (or Cmd) to select multiple students.</div>
+                            {{ form.students }} 
+                            {{ form.students.errors }}
+                        </div>
+                        <div class="col-md-12 mb-3">{{ form.notes.label_tag }} {{ form.notes }} {{ form.notes.errors }}</div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between">
+                        {% if parent %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteParentModal">Delete Parent</button>
+                        {% else %}
+                            <div></div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary px-4">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if parent %}
+<div class="modal fade" id="deleteParentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete {{ parent.name }}? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'students:parent_delete' parent.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base_portal.html" %}
+{% load humanize %}
+{% block title %}Fees{% endblock %}
+{% block content %}
+<h4 class="mb-4">Fees & Payments</h4>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Student</th><th>Description</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Due Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td>{{ inv.student.full_name }}</td>
+                <td>{{ inv.description }}</td>
+                <td>\u20b9{{ inv.amount|intcomma }}</td>
+                <td>\u20b9{{ inv.amount_paid|intcomma }}</td>
+                <td>\u20b9{{ inv.balance|intcomma }}</td>
+                <td>{{ inv.due_date|date:"d M Y" }}</td>
+                <td><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-3 text-muted">No fee records</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

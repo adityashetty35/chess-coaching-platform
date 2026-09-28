@@ -1,0 +1,261 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card bg-primary text-white" style="background: linear-gradient(135deg, #1a56db 0%, #3f83f8 100%);">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        {% if student.photo %}
+                            <img src="{{ student.photo.url }}" class="rounded-circle me-4 border border-3 border-white" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center me-4" style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: bold;">
+                                {{ student.first_name|first|upper }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h2 class="mb-1 text-white">{{ student.full_name }}</h2>
+                            <div class="mb-2">
+                                <span class="badge bg-white text-primary me-2">{{ student.get_chess_level_display }}</span>
+                                <span class="badge bg-white text-dark me-2">{{ student.get_coaching_type_display }}</span>
+                                <span class="badge bg-dark text-white">{{ student.get_status_display }}</span>
+                            </div>
+                            <div class="text-white-50">
+                                {% if student.age %}{{ student.age }} years old &bull; {% endif %} Joined {{ student.joining_date|date }}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'students:edit' student.id %}" class="btn btn-light"><i class="bi bi-pencil me-1"></i> Edit Profile</a>
+                        {% if not student.user %}
+                        <form action="{% url 'students:create_login' student.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light"><i class="bi bi-person-plus me-1"></i> Create Login</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted text-uppercase mb-2">Attendance</h6>
+                <h3 class="mb-0">{{ attendance_pct }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted text-uppercase mb-2">Recent Classes</h6>
+                <h3 class="mb-0">{{ recent_classes|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted text-uppercase mb-2">Invoices</h6>
+                <h3 class="mb-0">{{ invoices|length }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" id="studentTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab">Overview</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="classes-tab" data-bs-toggle="tab" href="#classes" role="tab">Classes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="fees-tab" data-bs-toggle="tab" href="#fees" role="tab">Fees</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="progress-tab" data-bs-toggle="tab" href="#progress" role="tab">Progress & Goals</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tournaments-tab" data-bs-toggle="tab" href="#tournaments" role="tab">Tournaments</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="studentTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h5 class="mb-3">Personal Information</h5>
+                        <table class="table table-sm table-borderless">
+                            <tr><th style="width: 150px;">Email</th><td>{{ student.email|default:"-" }}</td></tr>
+                            <tr><th>Phone</th><td>{{ student.phone|default:"-" }}</td></tr>
+                            <tr><th>WhatsApp</th><td>{{ student.whatsapp|default:"-" }}</td></tr>
+                            <tr><th>Address</th><td>{{ student.address|default:"-" }}</td></tr>
+                            <tr><th>School</th><td>{{ student.school|default:"-" }} (Class: {{ student.school_class|default:"-" }})</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <h5 class="mb-3">Chess Details</h5>
+                        <table class="table table-sm table-borderless">
+                            <tr><th style="width: 150px;">FIDE ID</th><td>{{ student.fide_id|default:"-" }}</td></tr>
+                            <tr><th>FIDE Rating</th><td>{{ student.fide_rating|default:"-" }}</td></tr>
+                            <tr><th>Chess.com</th><td>{{ student.chess_com_username|default:"-" }}</td></tr>
+                            <tr><th>Lichess</th><td>{{ student.lichess_username|default:"-" }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h5 class="mb-3">Parents/Guardians</h5>
+                        {% if student.parents.all %}
+                            <div class="list-group">
+                            {% for parent in student.parents.all %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ parent.name }} <span class="badge bg-light text-dark">{{ parent.get_relationship_display }}</span></h6>
+                                        <small>{{ parent.phone }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ parent.email }}</p>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No parents linked.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Strengths</h5>
+                        <p>{{ student.strengths|default:"Not specified."|linebreaks }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Weaknesses</h5>
+                        <p>{{ student.weaknesses|default:"Not specified."|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Classes Tab -->
+            <div class="tab-pane fade" id="classes" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for att in recent_classes %}
+                            <tr>
+                                <td>{{ att.chess_class.date|date }}</td>
+                                <td>{{ att.chess_class.topic }}</td>
+                                <td><span class="badge bg-{{ att.status|yesno:'success,danger' }}">{{ att.status }}</span></td>
+                                <td>{{ att.notes|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No recent classes found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Fees Tab -->
+            <div class="tab-pane fade" id="fees" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>{{ invoice.due_date|date }}</td>
+                                <td>₹{{ invoice.amount|intcomma }}</td>
+                                <td>{{ invoice.status }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted py-4">No invoices found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Progress & Goals Tab -->
+            <div class="tab-pane fade" id="progress" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Goals</h5>
+                        <ul class="list-group mb-4">
+                        {% for goal in goals %}
+                            <li class="list-group-item">{{ goal.description }} (Target: {{ goal.target_date|date }})</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No goals set.</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Progress Entries</h5>
+                        <ul class="list-group">
+                        {% for entry in progress_entries %}
+                            <li class="list-group-item">
+                                <strong>{{ entry.date|date }}:</strong> {{ entry.notes }}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No progress entries yet.</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tournaments Tab -->
+            <div class="tab-pane fade" id="tournaments" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tournament</th>
+                                <th>Date</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for tr in tournaments %}
+                            <tr>
+                                <td>{{ tr.tournament.name }}</td>
+                                <td>{{ tr.tournament.start_date|date }}</td>
+                                <td>{{ tr.score }} / {{ tr.rounds }} ({{ tr.position }} position)</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted py-4">No tournament results found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

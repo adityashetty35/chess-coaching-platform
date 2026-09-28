@@ -1,0 +1,53 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<style>
+    .fc-event { cursor: pointer; }
+    #calendar { min-height: 600px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'coaching:class_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Class</a>
+<a href="{% url 'coaching:class_list' %}" class="btn btn-outline-secondary btn-sm ms-2"><i class="bi bi-list me-1"></i>List View</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div id="calendar"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: '{% url "coaching:calendar_events" %}',
+            eventClick: function(info) {
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                    info.jsEvent.preventDefault();
+                }
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                meridiem: 'short'
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'coaching:class_edit' chess_class.pk %}" class="btn btn-primary btn-sm me-2">Edit Class</a>
+<a href="{% url 'coaching:class_list' %}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Class Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Title / Topic</div>
+                    <div class="col-sm-8 fw-semibold">{{ chess_class.title|default:chess_class.topic|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Date & Time</div>
+                    <div class="col-sm-8">{{ chess_class.date|date:"M d, Y" }} <br> {{ chess_class.start_time|time:"H:i" }} - {{ chess_class.end_time|time:"H:i" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Type</div>
+                    <div class="col-sm-8">
+                        {{ chess_class.get_class_type_display }} ({{ chess_class.get_mode_display }})
+                        {% if chess_class.batch %}
+                        <br><strong>Batch:</strong> {{ chess_class.batch.name }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Status</div>
+                    <div class="col-sm-8">
+                        {% if chess_class.status == 'scheduled' %}
+                        <span class="badge bg-primary">Scheduled</span>
+                        {% elif chess_class.status == 'completed' %}
+                        <span class="badge bg-success">Completed</span>
+                        {% elif chess_class.status == 'cancelled' %}
+                        <span class="badge bg-danger">Cancelled</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Rescheduled</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if chess_class.description %}
+                <div class="mb-3">
+                    <div class="text-muted mb-1">Description</div>
+                    <div class="p-3 bg-light rounded">{{ chess_class.description|linebreaks }}</div>
+                </div>
+                {% endif %}
+                
+                {% if chess_class.homework %}
+                <div class="mb-3">
+                    <div class="text-muted mb-1">Homework</div>
+                    <div class="p-3 bg-light rounded">{{ chess_class.homework|linebreaks }}</div>
+                </div>
+                {% endif %}
+                
+                {% if chess_class.coach_notes %}
+                <div class="mb-3">
+                    <div class="text-muted mb-1">Coach Notes (Internal)</div>
+                    <div class="p-3 bg-warning bg-opacity-10 rounded border border-warning">{{ chess_class.coach_notes|linebreaks }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Attendance</h5>
+                <a href="{% url 'coaching:mark_attendance' chess_class.pk %}" class="btn btn-sm btn-outline-primary">Mark / Edit</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in student_records %}
+                        <tr>
+                            <td>{{ record.student.full_name }}</td>
+                            <td>
+                                {% if record.attendance %}
+                                    {% if record.attendance.status == 'present' %}
+                                    <span class="badge bg-success">Present</span>
+                                    {% elif record.attendance.status == 'absent' %}
+                                    <span class="badge bg-danger">Absent</span>
+                                    {% elif record.attendance.status == 'late' %}
+                                    <span class="badge bg-warning text-dark">Late</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Excused</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted small">Not marked</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted py-2">No students attached</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ request.user.get_full_name|default:request.user.username }}{% endblock %}
+
+{% block page_actions %}
+<div class="dropdown">
+    <button class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="bi bi-plus-lg me-1"></i>Quick Add
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="{% url 'students:add' %}"><i class="bi bi-person-plus me-2"></i>Add Student</a></li>
+        <li><a class="dropdown-item" href="{% url 'enquiries:add' %}"><i class="bi bi-inbox me-2"></i>Add Enquiry</a></li>
+        <li><a class="dropdown-item" href="{% url 'coaching:class_add' %}"><i class="bi bi-calendar-plus me-2"></i>Schedule Class</a></li>
+        <li><a class="dropdown-item" href="{% url 'fees:invoice_add' %}"><i class="bi bi-receipt me-2"></i>Create Invoice</a></li>
+        <li><a class="dropdown-item" href="{% url 'assignments:add' %}"><i class="bi bi-journal-plus me-2"></i>Add Homework</a></li>
+        <li><a class="dropdown-item" href="{% url 'announcements:add' %}"><i class="bi bi-megaphone me-2"></i>Post Announcement</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value">{{ active_students }}</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-info">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value">{{ new_enquiries }}</div>
+                    <div class="stat-label">New Enquiries</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-inbox"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-success">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value">₹{{ fees_collected_month|intcomma }}</div>
+                    <div class="stat-label">Collected (Month)</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-currency-rupee"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-warning">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value">₹{{ pending_fees_total|intcomma }}</div>
+                    <div class="stat-label">Pending Fees</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-2 mb-4">
+    <div class="col-4 col-md-2">
+        <a href="{% url 'students:add' %}" class="quick-action">
+            <i class="bi bi-person-plus"></i>
+            <span>Add Student</span>
+        </a>
+    </div>
+    <div class="col-4 col-md-2">
+        <a href="{% url 'enquiries:add' %}" class="quick-action">
+            <i class="bi bi-inbox"></i>
+            <span>Add Enquiry</span>
+        </a>
+    </div>
+    <div class="col-4 col-md-2">
+        <a href="{% url 'fees:invoice_add' %}" class="quick-action">
+            <i class="bi bi-receipt"></i>
+            <span>Create Invoice</span>
+        </a>
+    </div>
+    <div class="col-4 col-md-2">
+        <a href="{% url 'coaching:class_add' %}" class="quick-action">
+            <i class="bi bi-calendar-plus"></i>
+            <span>Schedule Class</span>
+        </a>
+    </div>
+    <div class="col-4 col-md-2">
+        <a href="{% url 'assignments:add' %}" class="quick-action">
+            <i class="bi bi-journal-check"></i>
+            <span>Add Homework</span>
+        </a>
+    </div>
+    <div class="col-4 col-md-2">
+        <a href="{% url 'announcements:add' %}" class="quick-action">
+            <i class="bi bi-megaphone"></i>
+            <span>Announce</span>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Today's Classes -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-calendar-event me-2"></i>Today's Classes</span>
+                <a href="{% url 'coaching:class_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if today_classes %}
+                <div class="list-group list-group-flush">
+                    {% for cls in today_classes %}
+                    <a href="{% url 'coaching:class_detail' cls.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-500">{{ cls.title|default:cls.topic|default:"Class" }}</div>
+                                <small class="text-muted">
+                                    {{ cls.start_time|time:"h:i A" }} - {{ cls.end_time|time:"h:i A" }}
+                                    &middot; {{ cls.get_class_type_display }}
+                                    &middot; {{ cls.get_mode_display }}
+                                </small>
+                            </div>
+                            <span class="status-badge status-{{ cls.status }}">{{ cls.get_status_display }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-x d-block fs-3 mb-2"></i>
+                    <small>No classes today</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Classes -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-calendar-week me-2"></i>Upcoming Classes</span>
+                <a href="{% url 'coaching:class_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming_classes %}
+                <div class="list-group list-group-flush">
+                    {% for cls in upcoming_classes %}
+                    <a href="{% url 'coaching:class_detail' cls.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-500">{{ cls.title|default:cls.topic|default:"Class" }}</div>
+                                <small class="text-muted">
+                                    {{ cls.date|date:"D, d M" }} &middot; {{ cls.start_time|time:"h:i A" }}
+                                </small>
+                            </div>
+                            <span class="badge bg-light text-dark">{{ cls.get_class_type_display }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <small>No upcoming classes</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending/Overdue Fees -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-exclamation-circle me-2 text-danger"></i>Overdue Fees</span>
+                <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if overdue_invoices %}
+                <div class="list-group list-group-flush">
+                    {% for inv in overdue_invoices|slice:":5" %}
+                    <a href="{% url 'fees:invoice_detail' inv.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-500">{{ inv.student.full_name }}</div>
+                                <small class="text-muted">{{ inv.description }} &middot; Due: {{ inv.due_date|date:"d M Y" }}</small>
+                            </div>
+                            <span class="text-danger fw-600">₹{{ inv.balance|intcomma }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-check-circle d-block fs-3 mb-2 text-success"></i>
+                    <small>No overdue fees</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cash-stack me-2"></i>Recent Payments</span>
+                <a href="{% url 'fees:payment_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_payments %}
+                <div class="list-group list-group-flush">
+                    {% for pay in recent_payments %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-500">{{ pay.invoice.student.full_name }}</div>
+                                <small class="text-muted">{{ pay.payment_date|date:"d M Y" }} &middot; {{ pay.get_method_display }}</small>
+                            </div>
+                            <span class="text-success fw-600">₹{{ pay.amount|intcomma }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <small>No recent payments</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Follow-up Enquiries -->
+    {% if follow_up_enquiries %}
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-telephone me-2"></i>Follow-up Due
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for enq in follow_up_enquiries %}
+                    <a href="{% url 'enquiries:detail' enq.pk %}" class="list-group-item list-group-item-action">
+                        <div class="fw-500">{{ enq.student_name }}</div>
+                        <small class="text-muted">{{ enq.phone }} &middot; {{ enq.get_current_level_display }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Low Attendance Alerts -->
+    {% if low_attendance_students %}
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Low Attendance Alerts
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for item in low_attendance_students %}
+                    <a href="{% url 'students:detail' item.student.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-500">{{ item.student.full_name }}</div>
+                            <span class="badge bg-warning text-dark">{{ item.percentage }}%</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Upcoming Reminders -->
+    {% if upcoming_reminders %}
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bell me-2"></i>Upcoming Reminders
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for rem in upcoming_reminders %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-500">{{ rem.invoice.student.full_name }}</div>
+                                <small class="text-muted">{{ rem.scheduled_date|date:"d M Y" }} &middot; {{ rem.get_reminder_type_display }}</small>
+                            </div>
+                            <span class="badge bg-light text-dark">₹{{ rem.invoice.balance|intcomma }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

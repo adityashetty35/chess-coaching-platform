@@ -1,0 +1,26 @@
+{% extends "base_portal.html" %}
+{% block title %}Homework{% endblock %}
+{% block content %}
+<h4 class="mb-4">Homework</h4>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Assignment</th><th>Due Date</th><th>Status</th><th>Feedback</th></tr></thead>
+            <tbody>
+            {% for sub in submissions %}
+            <tr>
+                <td>
+                    <div class="fw-500">{{ sub.assignment.title }}</div>
+                    <small class="text-muted">{{ sub.assignment.description|truncatechars:100 }}</small>
+                </td>
+                <td>{{ sub.assignment.due_date|date:"d M Y" }}</td>
+                <td><span class="status-badge status-{{ sub.status }}">{{ sub.get_status_display }}</span></td>
+                <td>{{ sub.coach_feedback|default:"-" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="4" class="text-center py-3 text-muted">No homework assigned</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

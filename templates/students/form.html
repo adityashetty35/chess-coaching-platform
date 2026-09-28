@@ -1,0 +1,101 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ title }}</span>
+                <a href="{{ back_url_str }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">Personal Details</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.first_name.label_tag }} {{ form.first_name }} {{ form.first_name.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.last_name.label_tag }} {{ form.last_name }} {{ form.last_name.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.date_of_birth.label_tag }} {{ form.date_of_birth }} {{ form.date_of_birth.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.gender.label_tag }} {{ form.gender }} {{ form.gender.errors }}</div>
+                        <div class="col-md-12 mb-3">{{ form.photo.label_tag }} {{ form.photo }} {{ form.photo.errors }}</div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">Contact Details</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.email.label_tag }} {{ form.email }} {{ form.email.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.phone.label_tag }} {{ form.phone }} {{ form.phone.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.whatsapp.label_tag }} {{ form.whatsapp }} {{ form.whatsapp.errors }}</div>
+                        <div class="col-md-12 mb-3">{{ form.address.label_tag }} {{ form.address }} {{ form.address.errors }}</div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">School</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.school.label_tag }} {{ form.school }} {{ form.school.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.school_class.label_tag }} {{ form.school_class }} {{ form.school_class.errors }}</div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">Coaching</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.joining_date.label_tag }} {{ form.joining_date }} {{ form.joining_date.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.status.label_tag }} {{ form.status }} {{ form.status.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.coaching_type.label_tag }} {{ form.coaching_type }} {{ form.coaching_type.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.preferred_mode.label_tag }} {{ form.preferred_mode }} {{ form.preferred_mode.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.batch.label_tag }} {{ form.batch }} {{ form.batch.errors }}</div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">Chess</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.chess_level.label_tag }} {{ form.chess_level }} {{ form.chess_level.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.fide_id.label_tag }} {{ form.fide_id }} {{ form.fide_id.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.fide_rating.label_tag }} {{ form.fide_rating }} {{ form.fide_rating.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.chess_com_username.label_tag }} {{ form.chess_com_username }} {{ form.chess_com_username.errors }}</div>
+                        <div class="col-md-4 mb-3">{{ form.lichess_username.label_tag }} {{ form.lichess_username }} {{ form.lichess_username.errors }}</div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-2 text-primary">Assessment</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">{{ form.strengths.label_tag }} {{ form.strengths }} {{ form.strengths.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.weaknesses.label_tag }} {{ form.weaknesses }} {{ form.weaknesses.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.chess_goals.label_tag }} {{ form.chess_goals }} {{ form.chess_goals.errors }}</div>
+                        <div class="col-md-6 mb-3">{{ form.preferred_openings.label_tag }} {{ form.preferred_openings }} {{ form.preferred_openings.errors }}</div>
+                        <div class="col-md-12 mb-3">{{ form.notes.label_tag }} {{ form.notes }} {{ form.notes.errors }}</div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between">
+                        {% if student %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete Student</button>
+                        {% else %}
+                            <div></div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary px-4">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if student %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete {{ student.full_name }}? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'students:delete' student.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

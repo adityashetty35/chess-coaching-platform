@@ -1,0 +1,54 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}Enquiries Report{% endblock %}
+{% block page_actions %}<a href="{% url 'reports:export_csv' 'enquiries' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>{% endblock %}
+{% block content %}
+<div class="filter-bar d-flex flex-wrap gap-2 align-items-end mb-3">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label text-xs">From</label><input type="date" name="start" value="{{ filter_start }}" class="form-control form-control-sm"></div>
+        <div><label class="form-label text-xs">To</label><input type="date" name="end" value="{{ filter_end }}" class="form-control form-control-sm"></div>
+        <div><button class="btn btn-primary btn-sm">Filter</button></div>
+    </form>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card stat-primary"><div class="stat-value">{{ total }}</div><div class="stat-label">Total Enquiries</div></div></div>
+    <div class="col-md-3"><div class="stat-card stat-success"><div class="stat-value">{{ converted }}</div><div class="stat-label">Converted</div></div></div>
+    <div class="col-md-3"><div class="stat-card stat-info"><div class="stat-value">{{ conversion_rate }}%</div><div class="stat-label">Conversion Rate</div></div></div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">Status Breakdown</div>
+    <div class="card-body">
+        <div class="row g-2">
+            {% for label, count in status_counts.items %}
+            <div class="col-6 col-md-3">
+                <div class="border rounded p-3 text-center">
+                    <div class="fs-4 fw-bold">{{ count }}</div>
+                    <div class="text-muted small">{{ label }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">All Enquiries</div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Name</th><th>Phone</th><th>Level</th><th>Status</th><th>Source</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for e in enquiries %}
+            <tr>
+                <td><a href="{% url 'enquiries:detail' e.pk %}" class="text-decoration-none fw-500">{{ e.student_name }}</a></td>
+                <td>{{ e.phone }}</td>
+                <td>{{ e.get_current_level_display }}</td>
+                <td><span class="status-badge status-{{ e.status }}">{{ e.get_status_display }}</span></td>
+                <td>{{ e.source }}</td>
+                <td>{{ e.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No enquiries found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

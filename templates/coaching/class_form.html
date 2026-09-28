@@ -1,0 +1,48 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ title }}</span>
+                <a href="{% url back_url %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% include "includes/form_fields.html" %}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Save Class</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('id_class_type');
+        const batchField = document.getElementById('id_batch').closest('.mb-3');
+        const studentsField = document.getElementById('id_students').closest('.mb-3');
+
+        function toggleFields() {
+            if (typeSelect.value === 'group') {
+                batchField.style.display = 'block';
+                studentsField.style.display = 'none';
+            } else {
+                batchField.style.display = 'none';
+                studentsField.style.display = 'block';
+            }
+        }
+
+        if (typeSelect && batchField && studentsField) {
+            typeSelect.addEventListener('change', toggleFields);
+            toggleFields();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base_portal.html" %}
+{% block title %}My Classes{% endblock %}
+{% block content %}
+<h4 class="mb-4">Classes</h4>
+<div class="card mb-4">
+    <div class="card-header">Upcoming Classes</div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Date</th><th>Time</th><th>Topic</th><th>Type</th><th>Mode</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for cls in upcoming %}
+            <tr>
+                <td>{{ cls.date|date:"D, d M" }}</td>
+                <td>{{ cls.start_time|time:"h:i A" }} - {{ cls.end_time|time:"h:i A" }}</td>
+                <td>{{ cls.title|default:cls.topic|default:"-" }}</td>
+                <td>{{ cls.get_class_type_display }}</td>
+                <td>{{ cls.get_mode_display }}</td>
+                <td><span class="status-badge status-{{ cls.status }}">{{ cls.get_status_display }}</span></td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-3 text-muted">No upcoming classes</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">Past Classes</div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Date</th><th>Time</th><th>Topic</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for cls in past %}
+            <tr>
+                <td>{{ cls.date|date:"d M Y" }}</td>
+                <td>{{ cls.start_time|time:"h:i A" }}</td>
+                <td>{{ cls.title|default:cls.topic|default:"-" }}</td>
+                <td><span class="status-badge status-{{ cls.status }}">{{ cls.get_status_display }}</span></td>
+            </tr>
+            {% empty %}<tr><td colspan="4" class="text-center py-3 text-muted">No past classes</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

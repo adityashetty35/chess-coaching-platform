@@ -1,0 +1,83 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}Enquiries{% endblock %}
+{% block page_actions %}
+<a href="{% url 'enquiries:add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Enquiry</a>
+{% endblock %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <form class="d-flex" method="get">
+            <input type="text" name="q" class="form-control me-2" placeholder="Search by name, phone or email..." value="{{ search_query|default:'' }}">
+            <select name="status" class="form-select me-2" style="width: 200px;">
+                <option value="">All Statuses</option>
+                <option value="new" {% if current_status == 'new' %}selected{% endif %}>New</option>
+                <option value="contacted" {% if current_status == 'contacted' %}selected{% endif %}>Contacted</option>
+                <option value="trial_scheduled" {% if current_status == 'trial_scheduled' %}selected{% endif %}>Trial Scheduled</option>
+                <option value="trial_completed" {% if current_status == 'trial_completed' %}selected{% endif %}>Trial Completed</option>
+                <option value="converted" {% if current_status == 'converted' %}selected{% endif %}>Converted</option>
+                <option value="lost" {% if current_status == 'lost' %}selected{% endif %}>Lost</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary">Filter</button>
+            {% if search_query or current_status %}
+                <a href="{% url 'enquiries:list' %}" class="btn btn-link">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Student Name</th>
+                    <th>Contact</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for enquiry in enquiries %}
+            <tr>
+                <td>{{ enquiry.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <div class="fw-bold">{{ enquiry.student_name }}</div>
+                    {% if enquiry.age %}<small class="text-muted">Age: {{ enquiry.age }}</small>{% endif %}
+                </td>
+                <td>
+                    <div>{{ enquiry.phone }}</div>
+                    <small class="text-muted">{{ enquiry.email }}</small>
+                </td>
+                <td>{{ enquiry.get_current_level_display|default:"-" }}</td>
+                <td>
+                    <span class="badge status-badge status-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span>
+                </td>
+                <td class="text-end">
+                    <a href="{% url 'enquiries:detail' enquiry.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    <a href="{% url 'enquiries:edit' enquiry.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center py-4 text-muted">No enquiries found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-badge { padding: 0.4em 0.8em; font-weight: 500; }
+    .status-new { background-color: #e9ecef; color: #495057; }
+    .status-contacted { background-color: #cff4fc; color: #055160; }
+    .status-trial_scheduled { background-color: #fff3cd; color: #664d03; }
+    .status-trial_completed { background-color: #cfe2ff; color: #084298; }
+    .status-converted { background-color: #d1e7dd; color: #0f5132; }
+    .status-lost { background-color: #f8d7da; color: #842029; }
+</style>
+{% endblock %}

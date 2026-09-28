@@ -1,0 +1,50 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Reminders{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Scheduled Date</th>
+                    <th>Student</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for reminder in items %}
+            <tr>
+                <td>{{ reminder.scheduled_date|date:"d M Y" }}</td>
+                <td>{{ reminder.invoice.student.full_name }}</td>
+                <td>{{ reminder.get_reminder_type_display }}</td>
+                <td>
+                    {% if reminder.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif reminder.status == 'sent' %}
+                        <span class="badge bg-success">Sent</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Cancelled</span>
+                    {% endif %}
+                </td>
+                <td class="text-end">
+                    <a href="{% url 'fees:invoice_detail' reminder.invoice.pk %}" class="btn btn-sm btn-outline-primary" title="View Invoice"><i class="bi bi-eye"></i></a>
+                    {% if reminder.status == 'pending' %}
+                    <form method="post" action="{% url 'fees:cancel_reminder' reminder.pk %}" class="d-inline" onsubmit="return confirm('Cancel this reminder?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Reminder"><i class="bi bi-x-circle"></i></button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center py-4 text-muted">No reminders found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

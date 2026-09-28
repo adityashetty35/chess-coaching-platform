@@ -1,0 +1,51 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_actions %}<a href="{% url 'students:parent_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Parent</a>{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Parent/Guardian</th>
+                    <th>Contact</th>
+                    <th>Linked Students</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for parent in parents %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ parent.name }}</div>
+                        <span class="badge bg-light text-dark">{{ parent.get_relationship_display }}</span>
+                    </td>
+                    <td>
+                        <div><i class="bi bi-telephone text-muted me-1"></i> {{ parent.phone }}</div>
+                        {% if parent.email %}<div><i class="bi bi-envelope text-muted me-1"></i> {{ parent.email }}</div>{% endif %}
+                    </td>
+                    <td>
+                        {% for s in parent.students.all %}
+                            <a href="{% url 'students:detail' s.id %}" class="badge bg-primary text-decoration-none me-1">{{ s.full_name }}</a>
+                        {% empty %}
+                            <span class="text-muted small">None linked</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{% url 'students:parent_edit' parent.id %}" class="btn btn-sm btn-outline-secondary mb-1">Edit</a>
+                        {% if not parent.user %}
+                        <form action="{% url 'students:parent_create_login' parent.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary mb-1" title="Create Login"><i class="bi bi-person-plus"></i></button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center py-4 text-muted empty-state">No parents found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

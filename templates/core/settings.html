@@ -1,0 +1,184 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-body p-0">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="{% url 'settings:index' %}"><i class="bi bi-gear me-2"></i>General Settings</a>
+                    <a class="nav-link" href="{% url 'settings:services' %}"><i class="bi bi-stars me-2"></i>Services</a>
+                    <a class="nav-link" href="{% url 'settings:programs' %}"><i class="bi bi-box me-2"></i>Programs</a>
+                    <a class="nav-link" href="{% url 'settings:testimonials' %}"><i class="bi bi-chat-quote me-2"></i>Testimonials</a>
+                    <a class="nav-link" href="{% url 'settings:faqs' %}"><i class="bi bi-question-circle me-2"></i>FAQs</a>
+                    <a class="nav-link" href="{% url 'settings:achievements' %}"><i class="bi bi-award me-2"></i>Achievements</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card mb-3">
+                <div class="card-header">Academy Information</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Academy Name</label>
+                            {{ form.academy_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Coach Name</label>
+                            {{ form.coach_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Logo</label>
+                            {{ form.logo }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tagline</label>
+                            {{ form.tagline }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">About</label>
+                            {{ form.about }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Contact Information</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">WhatsApp</label>
+                            {{ form.whatsapp }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Social Media</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Facebook URL</label>
+                            {{ form.facebook_url }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Instagram URL</label>
+                            {{ form.instagram_url }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">YouTube URL</label>
+                            {{ form.youtube_url }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Twitter URL</label>
+                            {{ form.twitter_url }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">LinkedIn URL</label>
+                            {{ form.linkedin_url }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Currency & Reminders</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Currency Symbol</label>
+                            {{ form.currency_symbol }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Currency Code</label>
+                            {{ form.currency_code }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Fee Reminder Template</label>
+                            {{ form.fee_reminder_template }}
+                            <div class="form-text">Variables: {parent_name}, {amount}, {student_name}, {due_date}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Website Hero Section</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Hero Title</label>
+                            {{ form.hero_title }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Hero Subtitle</label>
+                            {{ form.hero_subtitle }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CTA Button Text</label>
+                            {{ form.hero_cta_text }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Coach Profile</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Coach Title</label>
+                            {{ form.coach_title }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Coach Photo</label>
+                            {{ form.coach_photo }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Coach Bio</label>
+                            {{ form.coach_bio }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Experience</label>
+                            {{ form.coach_experience }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rating</label>
+                            {{ form.coach_rating }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Students Trained</label>
+                            {{ form.coach_students_trained }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-check-lg me-1"></i>Save Settings
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

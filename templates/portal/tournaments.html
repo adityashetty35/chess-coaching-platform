@@ -1,0 +1,28 @@
+{% extends "base_portal.html" %}
+{% block title %}Tournaments{% endblock %}
+{% block content %}
+<h4 class="mb-4">Tournament Results</h4>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Tournament</th><th>Date</th><th>Score</th><th>Rank</th><th>Rating Before</th><th>Rating After</th><th>Change</th></tr></thead>
+            <tbody>
+            {% for r in results %}
+            <tr>
+                <td class="fw-500">{{ r.tournament_name }}</td>
+                <td>{{ r.date|date:"d M Y" }}</td>
+                <td>{{ r.score|default:"-" }}</td>
+                <td>{{ r.rank|default:"-" }}</td>
+                <td>{{ r.rating_before|default:"-" }}</td>
+                <td>{{ r.rating_after|default:"-" }}</td>
+                <td>{% if r.rating_change is not None %}
+                    {% if r.rating_change > 0 %}<span class="text-success">+{{ r.rating_change }}</span>{% elif r.rating_change < 0 %}<span class="text-danger">{{ r.rating_change }}</span>{% else %}0{% endif %}
+                    {% else %}-{% endif %}</td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-3 text-muted">No tournament results</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

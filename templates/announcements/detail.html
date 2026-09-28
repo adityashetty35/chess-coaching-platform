@@ -1,0 +1,24 @@
+{% extends "base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'announcements:list' %}" class="btn btn-outline-secondary btn-sm me-2">Back</a>
+<a href="{% url 'announcements:edit' pk=announcement.pk %}" class="btn btn-primary btn-sm">Edit</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h4 class="mb-3">{{ announcement.title }} <span class="status-badge status-{{ announcement.priority }} ms-2 fs-6">{{ announcement.get_priority_display }}</span></h4>
+        <div class="mb-3 text-muted">
+            <small>
+                <strong>Published:</strong> {{ announcement.publish_date|date:"F j, Y H:i" }} | 
+                <strong>Audience:</strong> {{ announcement.get_audience_display }}
+                {% if announcement.expiry_date %}| <strong>Expires:</strong> {{ announcement.expiry_date }}{% endif %}
+            </small>
+        </div>
+        <hr>
+        <div class="content mt-3">
+            {{ announcement.content|linebreaks }}
+        </div>
+    </div>
+</div>
+{% endblock %}

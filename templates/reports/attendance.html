@@ -1,0 +1,52 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% block page_title %}Attendance Report{% endblock %}
+{% block page_actions %}<a href="{% url 'reports:export_csv' 'attendance' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>{% endblock %}
+{% block content %}
+<div class="filter-bar d-flex flex-wrap gap-2 align-items-end mb-3">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label text-xs">From</label><input type="date" name="start" value="{{ filter_start }}" class="form-control form-control-sm"></div>
+        <div><label class="form-label text-xs">To</label><input type="date" name="end" value="{{ filter_end }}" class="form-control form-control-sm"></div>
+        <div><label class="form-label text-xs">Student</label>
+            <select name="student" class="form-select form-select-sm"><option value="">All</option>
+            {% for s in students %}<option value="{{ s.pk }}" {% if filter_student == s.pk|stringformat:"d" %}selected{% endif %}>{{ s.full_name }}</option>{% endfor %}
+            </select>
+        </div>
+        <div><button class="btn btn-primary btn-sm">Filter</button></div>
+    </form>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card stat-primary"><div class="stat-value">{{ total }}</div><div class="stat-label">Total Records</div></div></div>
+    <div class="col-md-3"><div class="stat-card stat-success"><div class="stat-value">{{ present }}</div><div class="stat-label">Present</div></div></div>
+    <div class="col-md-3"><div class="stat-card stat-danger"><div class="stat-value">{{ absent }}</div><div class="stat-label">Absent</div></div></div>
+    <div class="col-md-3"><div class="stat-card stat-info"><div class="stat-value">{{ overall_pct }}%</div><div class="stat-label">Overall Rate</div></div></div>
+</div>
+<div class="card">
+    <div class="card-header">Per-Student Summary</div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Student</th><th>Total</th><th>Present</th><th>Absent</th><th>Attendance %</th><th></th></tr></thead>
+            <tbody>
+            {% for item in student_summary %}
+            <tr>
+                <td><a href="{% url 'students:detail' item.student.pk %}" class="text-decoration-none fw-500">{{ item.student.full_name }}</a></td>
+                <td>{{ item.total }}</td>
+                <td>{{ item.present }}</td>
+                <td>{{ item.absent }}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="width:100px">
+                            <div class="progress-bar {% if item.percentage >= 80 %}bg-success{% elif item.percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}" style="width:{{ item.percentage }}%"></div>
+                        </div>
+                        <span class="text-sm fw-500">{{ item.percentage }}%</span>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
