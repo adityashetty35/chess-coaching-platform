@@ -3,13 +3,16 @@
 {% block page_title %}Enquiry Form{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg landing-nav mb-4" style="background: #0b132b; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'website:home' %}">
-            {{ site_settings.academy_name|default:"Chess Academy" }}
+        <a class="navbar-brand text-white fw-bold d-flex align-items-center gap-2" href="{% url 'website:home' %}">
+            <span style="color: #f59e0b; font-size: 1.5rem;">♚</span>
+            <span>{{ site_settings.academy_name|default:"Grandmaster Chess Academy" }}</span>
         </a>
         <div class="d-flex">
-            <a href="{% url 'website:home' %}" class="btn btn-outline-light btn-sm">Back to Home</a>
+            <a href="{% url 'website:home' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Back to Home
+            </a>
         </div>
     </div>
 </nav>
@@ -106,8 +109,10 @@
                             {{ form.message.errors }}
                         </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Submit Enquiry</button>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3 fw-bold shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i>Submit Enquiry
+                            </button>
                         </div>
                     </form>
                 </div>
