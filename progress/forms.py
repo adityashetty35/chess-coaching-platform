@@ -1,5 +1,32 @@
 from django import forms
-from .models import ProgressEntry, Goal
+from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord
+
+
+class SyllabusLessonForm(forms.ModelForm):
+    class Meta:
+        model = SyllabusLesson
+        fields = ['level', 'title', 'description', 'home_practice_url', 'order']
+
+
+class TestResultForm(forms.ModelForm):
+    class Meta:
+        model = TestResult
+        fields = ['student', 'title', 'test_date', 'score', 'max_score', 'coach_feedback', 'game_analysis']
+        widgets = {'test_date': forms.DateInput(attrs={'type': 'date'})}
+
+    def clean(self):
+        data = super().clean()
+        if data.get('score') is not None and data.get('max_score') is not None:
+            if data['max_score'] <= 0 or not 0 <= data['score'] <= data['max_score']:
+                raise forms.ValidationError('Score must be between 0 and the positive maximum score.')
+        return data
+
+
+class FideRatingRecordForm(forms.ModelForm):
+    class Meta:
+        model = FideRatingRecord
+        fields = ['student', 'recorded_on', 'rating', 'source_url']
+        widgets = {'recorded_on': forms.DateInput(attrs={'type': 'date'})}
 
 class ProgressEntryForm(forms.ModelForm):
     class Meta:

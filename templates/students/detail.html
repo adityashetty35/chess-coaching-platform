@@ -85,7 +85,6 @@
                 <a class="nav-link" id="progress-tab" data-bs-toggle="tab" href="#progress" role="tab">Progress & Goals</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="tournaments-tab" data-bs-toggle="tab" href="#tournaments" role="tab">Tournaments</a>
             </li>
         </ul>
     </div>
@@ -230,31 +229,6 @@
                 </div>
             </div>
 
-            <!-- Tournaments Tab -->
-            <div class="tab-pane fade" id="tournaments" role="tabpanel">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Tournament</th>
-                                <th>Date</th>
-                                <th>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for tr in tournaments %}
-                            <tr>
-                                <td>{{ tr.tournament.name }}</td>
-                                <td>{{ tr.tournament.start_date|date }}</td>
-                                <td>{{ tr.score }} / {{ tr.rounds }} ({{ tr.position }} position)</td>
-                            </tr>
-                        {% empty %}
-                            <tr><td colspan="3" class="text-center text-muted py-4">No tournament results found.</td></tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </div>

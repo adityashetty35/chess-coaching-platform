@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block body_class %}site{% endblock %}
+{% block content %}
+{% include 'website/_nav.html' %}
+
+<header class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="eyebrow">Indian Chess Raider Academy · Coach Mr Asfar</div>
+        <h1 class="display mb-4">Train smart.<br>Think sharp.<br>Become FIDE rated.</h1>
+        <p class="lede mb-5">Structured chess coaching that develops confident tournament players and future FIDE-rated champions.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a class="btn btn-primary btn-lg" href="{% url 'website:enquiry' %}">Join now</a>
+          <a class="btn btn-outline-primary btn-lg" href="tel:+917977912209">Call 7977912209</a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="board" role="img" aria-label="Decorative chess board">
+          <span class="piece" style="grid-area:1 / 1">♜</span><span class="piece" style="grid-area:1 / 5">♚</span>
+          <span class="piece" style="grid-area:2 / 2">♟</span><span class="piece" style="grid-area:2 / 6">♟</span>
+          <span class="piece" style="grid-area:4 / 4">♞</span><span class="piece" style="grid-area:5 / 5">♙</span>
+          <span class="piece" style="grid-area:7 / 5">♕</span><span class="piece" style="grid-area:8 / 5">♔</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="eyebrow">Our mission</div>
+    <h2 class="section-title">Chess coaching with a clear purpose</h2>
+    <p class="section-desc">Our mission is to develop confident tournament players and future FIDE-rated champions through structured, step-by-step training.</p>
+  </div>
+</section>
+
+<section class="section" id="courses">
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Course structure</div><h2 class="section-title">A clear path to stronger chess</h2></div>
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Foundation</h3><p>6 months · Absolute beginners</p><div class="chip mb-3">Rating guide: 200–300</div><ul><li>Board and piece fundamentals</li><li>Basic checkmates and tactics</li><li>Opening principles</li><li>Guided practice games and correction</li></ul></div></div>
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Beginner</h3><p>6 months · Familiar with the basic rules</p><div class="chip mb-3">Rating guide: 500–700</div><ul><li>Forks, pins, skewers and tactics</li><li>Basic opening repertoire</li><li>Middlegame planning</li><li>Endgames and game analysis</li></ul></div></div>
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Advanced Beginner</h3><p>6–12 months</p><div class="chip mb-3">Rating guide: 1000–1200</div><ul><li>White and Black opening preparation</li><li>Calculation and thinking process</li><li>Pawn structures and positional play</li><li>Tournament preparation</li></ul></div></div>
+    </div>
+    <p class="mt-4 text-muted">The rating ranges are course guidance, not promises of a FIDE rating.</p>
+  </div>
+</section>
+
+<section class="section" id="fees">
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Fees</div><h2 class="section-title">Choose your training format</h2></div>
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Weekend Batch</h3><p>Foundation &amp; Beginner</p><div class="price">₹2,500 <small>/ month</small></div><p>Saturday &amp; Sunday · 1 hour</p><a class="btn btn-outline-primary w-100" href="{% url 'website:enquiry' %}">Enquire</a></div></div>
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Career-Focused Batch</h3><p>Focused chess coaching</p><div class="price">₹4,000 <small>/ month</small></div><p>Thursday &amp; Friday · 2 hours each day</p><a class="btn btn-outline-primary w-100" href="{% url 'website:enquiry' %}">Enquire</a></div></div>
+      <div class="col-lg-4"><div class="price-card h-100"><h3>Personal Training</h3><p>At your place</p><div class="price">₹8,000 <small>/ month</small></div><p>Thursday &amp; Friday · 1 hour each day</p><a class="btn btn-outline-primary w-100" href="{% url 'website:enquiry' %}">Enquire</a></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="benefits">
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Beyond the board</div><h2 class="section-title">What chess develops in your child</h2></div>
+    <div class="feature-grid">
+      <div class="feature"><h3>Thinking skills</h3><p>Smart decisions, analytical and logical thinking, problem solving and stronger memory.</p></div>
+      <div class="feature"><h3>Confidence and character</h3><p>Leadership, responsibility, discipline, focus and patience.</p></div>
+      <div class="feature"><h3>Long-term growth</h3><p>Time management, a structured syllabus, continuous progress feedback and a roadmap toward competitive chess.</p></div>
+    </div>
+    <div class="mt-5"><h3>Why choose us?</h3><p>Step-by-step training, mindset development, regular progress tracking, Lichess home-practice material and long-term tournament preparation.</p></div>
+    <div class="text-center mt-5"><a class="btn btn-primary btn-lg" href="{% url 'website:enquiry' %}">Join Indian Chess Raider Academy</a></div>
+  </div>
+</section>
+{% include 'website/_footer.html' %}
+{% endblock %}

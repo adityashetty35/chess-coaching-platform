@@ -1,0 +1,19 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}Academy settings{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    <h5 class="mb-3">Contact details</h5>
+    <p class="text-muted">The public course structure and fees are fixed to the academy brief. Update the contact information here.</p>
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Email</label>{{ form.email }}{{ form.email.errors }}</div>
+      <div class="col-md-6"><label class="form-label">Phone</label>{{ form.phone }}{{ form.phone.errors }}</div>
+      <div class="col-md-6"><label class="form-label">WhatsApp</label>{{ form.whatsapp }}{{ form.whatsapp.errors }}</div>
+      <div class="col-12"><label class="form-label">Address</label>{{ form.address }}{{ form.address.errors }}</div>
+      <div class="col-12"><label class="form-label">Fee reminder template</label>{{ form.fee_reminder_template }}{{ form.fee_reminder_template.errors }}<p class="form-text">For the existing manual reminder workflow; automated delivery needs provider setup.</p></div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-4">Save settings</button>
+  </form>
+</div></div>
+{% endblock %}

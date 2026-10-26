@@ -31,14 +31,12 @@
                 <li class="nav-item">
                     <a class="nav-link{% if current == 'progress' %} active{% endif %}" href="{% url 'portal:progress' %}">Progress</a>
                 </li>
+                <li class="nav-item"><a class="nav-link{% if current == 'learning' %} active{% endif %}" href="{% url 'portal:learning' %}">Syllabus &amp; Tests</a></li>
                 {% if request.user.parent_profile %}
                 <li class="nav-item">
                     <a class="nav-link{% if current == 'fees' %} active{% endif %}" href="{% url 'portal:fees' %}">Fees</a>
                 </li>
                 {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link{% if current == 'announcements' %} active{% endif %}" href="{% url 'portal:announcements' %}">Announcements</a>
-                </li>
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">

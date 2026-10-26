@@ -25,11 +25,6 @@ except ImportError:
     pass
 
 try:
-    from tournaments.models import TournamentResult
-except ImportError:
-    pass
-
-try:
     from assignments.models import AssignmentSubmission
 except ImportError:
     pass
@@ -97,12 +92,6 @@ def student_detail(request, student_id):
     except Exception:
         pass
 
-    tournaments = []
-    try:
-        tournaments = TournamentResult.objects.filter(student=student).order_by('-tournament__start_date')
-    except Exception:
-        pass
-
     assignments = []
     try:
         assignments = AssignmentSubmission.objects.filter(student=student).order_by('-submitted_at')
@@ -117,7 +106,6 @@ def student_detail(request, student_id):
         'invoices': invoices,
         'progress_entries': progress_entries,
         'goals': goals,
-        'tournaments': tournaments,
         'assignments': assignments,
     }
     return render(request, 'students/detail.html', context)

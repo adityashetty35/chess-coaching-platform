@@ -41,7 +41,7 @@ def home(request):
 
     context['avg_rating'] = context['testimonials'].aggregate(avg=Avg('rating'))['avg']
 
-    return render(request, 'website/home.html', context)
+    return render(request, 'website/home_academy.html', context)
 
 def enquiry_form(request):
     if request.method == 'POST':

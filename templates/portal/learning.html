@@ -1,0 +1,17 @@
+{% extends 'base_portal.html' %}
+{% block title %}Learning &amp; Test Results{% endblock %}
+{% block content %}
+<h2 class="mb-4">Syllabus &amp; Test Results</h2>
+<div class="card mb-4"><div class="card-header">Course syllabus</div><div class="card-body">
+{% for lesson in lessons %}<div class="border-bottom py-2"><strong>{{ lesson.get_level_display }} · {{ lesson.title }}</strong><p class="mb-1 text-muted">{{ lesson.description }}</p>{% if lesson.home_practice_url %}<a href="{{ lesson.home_practice_url }}" rel="noopener" target="_blank">Practice at home</a>{% endif %}</div>
+{% empty %}<p class="text-muted">Syllabus will be published soon.</p>{% endfor %}
+</div></div>
+<div class="card mb-4"><div class="card-header">Academy tests and coach feedback</div><div class="card-body">
+{% for test in tests %}<div class="border-bottom py-2"><strong>{{ test.student }} · {{ test.title }}</strong><p class="mb-1">{{ test.test_date }} · Score: {{ test.score }}/{{ test.max_score }}</p><p class="mb-1">{{ test.coach_feedback }}</p>{% if test.game_analysis %}<p class="small text-muted">Game analysis: {{ test.game_analysis }}</p>{% endif %}</div>
+{% empty %}<p class="text-muted">No test results recorded yet.</p>{% endfor %}
+</div></div>
+<div class="card"><div class="card-header">Verified official FIDE ratings</div><div class="card-body">
+{% for record in ratings %}<div class="border-bottom py-2"><strong>{{ record.student }} · {{ record.rating }}</strong><span class="text-muted"> · {{ record.recorded_on }}</span> <a href="{{ record.source_url }}" target="_blank" rel="noopener">Official source</a></div>
+{% empty %}<p class="text-muted">No officially verified rating recorded yet.</p>{% endfor %}
+</div></div>
+{% endblock %}

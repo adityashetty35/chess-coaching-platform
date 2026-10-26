@@ -5,9 +5,8 @@ from students.models import Student
 from coaching.models import ChessClass, Attendance
 from fees.models import Invoice
 from progress.models import ProgressEntry, Goal
-from tournaments.models import TournamentResult
 from assignments.models import AssignmentSubmission
-from announcements.models import Announcement
+from progress.models import SyllabusLesson, TestResult, FideRatingRecord
 
 def get_portal_students(user):
     students = []
@@ -35,9 +34,6 @@ def portal_dashboard(request):
         'upcoming_classes': ChessClass.objects.filter(
             students__in=students, date__gte=today, status='scheduled'
         ).distinct().order_by('date', 'start_time')[:5],
-        'recent_announcements': Announcement.objects.filter(
-            is_active=True
-        ).order_by('-publish_date')[:5],
         'pending_homework': AssignmentSubmission.objects.filter(
             student__in=students, status__in=['pending', 'in_progress']
         ).select_related('assignment')[:5],
@@ -121,6 +117,19 @@ def portal_progress(request):
     return render(request, 'portal/progress.html', {
         'progress_data': progress_data,
         'students': students,
+    })
+
+
+@login_required
+def portal_learning(request):
+    students = get_portal_students(request.user)
+    if not students:
+        return render(request, 'portal/no_access.html')
+    return render(request, 'portal/learning.html', {
+        'students': students,
+        'lessons': SyllabusLesson.objects.all(),
+        'tests': TestResult.objects.filter(student__in=students).select_related('student'),
+        'ratings': FideRatingRecord.objects.filter(student__in=students).select_related('student'),
     })
 
 @login_required

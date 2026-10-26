@@ -58,7 +58,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'coaching' and 'batch' not in request.path %}active{% endif %}" href="{% url 'coaching:class_list' %}">
-                    <i class="bi bi-calendar-event"></i><span>Classes</span>
+                    <i class="bi bi-calendar-event"></i><span>Lessons &amp; Attendance</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -72,23 +72,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'progress' %}active{% endif %}" href="{% url 'progress:academy_records' %}">
+                    <i class="bi bi-journal-bookmark"></i><span>Syllabus &amp; Tests</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'assignments' %}active{% endif %}" href="{% url 'assignments:list' %}">
                     <i class="bi bi-journal-check"></i><span>Homework</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.app_name == 'tournaments' %}active{% endif %}" href="{% url 'tournaments:list' %}">
-                    <i class="bi bi-trophy"></i><span>Tournaments</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.app_name == 'announcements' %}active{% endif %}" href="{% url 'announcements:list' %}">
-                    <i class="bi bi-megaphone"></i><span>Announcements</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}" href="{% url 'reports:index' %}">
-                    <i class="bi bi-bar-chart"></i><span>Reports</span>
                 </a>
             </li>
         </ul>

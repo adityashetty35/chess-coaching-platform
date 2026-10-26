@@ -4,6 +4,9 @@ from . import views
 app_name = 'progress'
 
 urlpatterns = [
+    path('academy/', views.academy_records, name='academy_records'),
+    path('academy/<str:kind>/add/', views.academy_record_form, name='academy_add'),
+    path('academy/<str:kind>/<int:pk>/edit/', views.academy_record_form, name='academy_edit'),
     path('student/<int:student_pk>/', views.progress_list, name='list'),
     path('student/<int:student_pk>/add/', views.progress_form, name='form'),
     path('student/<int:student_pk>/<int:pk>/edit/', views.progress_form, name='form'),

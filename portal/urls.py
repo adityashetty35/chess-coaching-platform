@@ -9,8 +9,6 @@ urlpatterns = [
     path("attendance/", views.portal_attendance, name="attendance"),
     path("homework/", views.portal_homework, name="homework"),
     path("progress/", views.portal_progress, name="progress"),
-    path("goals/", views.portal_goals, name="goals"),
-    path("tournaments/", views.portal_tournaments, name="tournaments"),
+    path("learning/", views.portal_learning, name="learning"),
     path("fees/", views.portal_fees, name="fees"),
-    path("announcements/", views.portal_announcements, name="announcements"),
 ]

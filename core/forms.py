@@ -26,6 +26,12 @@ class SiteSettingsForm(forms.ModelForm):
             elif isinstance(field.widget, forms.FileInput):
                 field.widget.attrs.setdefault('class', 'form-control')
 
+
+class AcademySettingsForm(SiteSettingsForm):
+    class Meta(SiteSettingsForm.Meta):
+        fields = ['email', 'phone', 'whatsapp', 'address', 'fee_reminder_template']
+        exclude = []
+
 class CoachingServiceForm(forms.ModelForm):
     class Meta:
         model = CoachingService

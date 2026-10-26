@@ -53,13 +53,14 @@ def dashboard(request):
 
 @coach_required
 def settings_view(request):
+    from .forms import AcademySettingsForm
     settings = SiteSettings.load()
-    form = SiteSettingsForm(request.POST or None, request.FILES or None, instance=settings)
+    form = AcademySettingsForm(request.POST or None, request.FILES or None, instance=settings)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Settings updated successfully.")
         return redirect("settings:index")
-    return render(request, "core/settings.html", {"form": form})
+    return render(request, "core/settings_academy.html", {"form": form})
 
 
 @coach_required

@@ -73,21 +73,8 @@
         {% endif %}
 
         <div class="card">
-            <div class="card-header"><i class="bi bi-megaphone me-2"></i>Announcements</div>
-            <div class="card-body p-0">
-                {% if recent_announcements %}
-                <div class="list-group list-group-flush">
-                    {% for ann in recent_announcements %}
-                    <div class="list-group-item">
-                        <div class="fw-500">{{ ann.title }}</div>
-                        <small class="text-muted">{{ ann.publish_date|date:"d M Y" }}</small>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-4 text-muted"><small>No announcements</small></div>
-                {% endif %}
-            </div>
+            <div class="card-header"><i class="bi bi-stars me-2"></i>Keep growing</div>
+            <div class="card-body"><p class="mb-0">Every great chess player began by learning one move at a time. Keep practising!</p></div>
         </div>
     </div>
 </div>

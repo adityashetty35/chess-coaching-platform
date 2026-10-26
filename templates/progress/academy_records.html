@@ -1,0 +1,27 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}Lessons, Tests &amp; FIDE{% endblock %}
+{% block page_subtitle %}Academy syllabus and verified student results{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between"><span>Course syllabus</span><a class="btn btn-primary btn-sm" href="{% url 'progress:academy_add' 'lesson' %}">Add lesson</a></div>
+  <div class="card-body">
+    {% for lesson in lessons %}
+      <div class="py-2 border-bottom"><a href="{% url 'progress:academy_edit' 'lesson' lesson.pk %}">{{ lesson.get_level_display }} · {{ lesson.title }}</a><div class="small text-muted">{{ lesson.description }}</div>{% if lesson.home_practice_url %}<a href="{{ lesson.home_practice_url }}" rel="noopener" target="_blank">Home practice</a>{% endif %}</div>
+    {% empty %}<p class="text-muted mb-0">No syllabus lessons yet.</p>{% endfor %}
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between"><span>Academy tests</span><a class="btn btn-primary btn-sm" href="{% url 'progress:academy_add' 'test' %}">Record test</a></div>
+  <div class="card-body">
+    {% for test in tests %}<div class="py-2 border-bottom"><a href="{% url 'progress:academy_edit' 'test' test.pk %}">{{ test.student }} · {{ test.title }}</a><div class="small text-muted">{{ test.test_date }} · {{ test.score }} / {{ test.max_score }} · {{ test.coach_feedback|truncatewords:15 }}</div></div>
+    {% empty %}<p class="text-muted mb-0">No test results yet.</p>{% endfor %}
+  </div>
+</div>
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Official FIDE ratings</span><a class="btn btn-primary btn-sm" href="{% url 'progress:academy_add' 'fide' %}">Verify rating</a></div>
+  <div class="card-body">
+    {% for rating in ratings %}<div class="py-2 border-bottom"><a href="{% url 'progress:academy_edit' 'fide' rating.pk %}">{{ rating.student }} · {{ rating.rating }}</a><div class="small text-muted">{{ rating.recorded_on }} · Verified by {{ rating.verified_by }} · <a href="{{ rating.source_url }}" target="_blank" rel="noopener">Official source</a></div></div>
+    {% empty %}<p class="text-muted mb-0">No verified ratings yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -15,7 +15,6 @@
         <li><a class="dropdown-item" href="{% url 'coaching:class_add' %}"><i class="bi bi-calendar-plus me-2"></i>Schedule Class</a></li>
         <li><a class="dropdown-item" href="{% url 'fees:invoice_add' %}"><i class="bi bi-receipt me-2"></i>Create Invoice</a></li>
         <li><a class="dropdown-item" href="{% url 'assignments:add' %}"><i class="bi bi-journal-plus me-2"></i>Add Homework</a></li>
-        <li><a class="dropdown-item" href="{% url 'announcements:add' %}"><i class="bi bi-megaphone me-2"></i>Post Announcement</a></li>
     </ul>
 </div>
 {% endblock %}
@@ -99,12 +98,6 @@
         <a href="{% url 'assignments:add' %}" class="quick-action">
             <i class="bi bi-journal-check"></i>
             <span>Add Homework</span>
-        </a>
-    </div>
-    <div class="col-4 col-md-2">
-        <a href="{% url 'announcements:add' %}" class="quick-action">
-            <i class="bi bi-megaphone"></i>
-            <span>Announce</span>
         </a>
     </div>
 </div>

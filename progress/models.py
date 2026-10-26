@@ -63,3 +63,54 @@ class Goal(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.title}"
+
+
+class SyllabusLesson(models.Model):
+    LEVEL_CHOICES = [
+        ('foundation', 'Foundation'),
+        ('beginner', 'Beginner'),
+        ('advanced_beginner', 'Advanced Beginner'),
+        ('intermediate', 'Intermediate'),
+    ]
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    home_practice_url = models.URLField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['level', 'order', 'title']
+
+    def __str__(self):
+        return f"{self.get_level_display()}: {self.title}"
+
+
+class TestResult(models.Model):
+    student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='test_results')
+    title = models.CharField(max_length=200)
+    test_date = models.DateField()
+    score = models.DecimalField(max_digits=6, decimal_places=2)
+    max_score = models.DecimalField(max_digits=6, decimal_places=2)
+    coach_feedback = models.TextField(blank=True)
+    game_analysis = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-test_date', '-id']
+
+    def __str__(self):
+        return f"{self.student}: {self.title}"
+
+
+class FideRatingRecord(models.Model):
+    student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='verified_fide_ratings')
+    recorded_on = models.DateField()
+    rating = models.PositiveIntegerField()
+    source_url = models.URLField(help_text='Official FIDE profile or rating source')
+    verified_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='verified_chess_ratings')
+    verified_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-recorded_on', '-id']
+
+    def __str__(self):
+        return f"{self.student}: {self.rating} (verified)"
