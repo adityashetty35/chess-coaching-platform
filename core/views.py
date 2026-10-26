@@ -7,48 +7,33 @@ from .forms import *
 @coach_required
 def dashboard(request):
     from students.models import Student
+    from students.models import Parent
     from enquiries.models import Enquiry
     from coaching.models import ChessClass, Attendance
-    from fees.models import Invoice, Payment, PaymentReminder
+    from fees.models import Invoice
+    from progress.models import TestResult, ScheduledTest
     from django.utils import timezone
-    from django.db.models import Sum, Q
-    from datetime import timedelta
+    from django.db.models import Sum, F, DecimalField
 
     today = timezone.now().date()
-
+    unpaid = Invoice.objects.exclude(status='cancelled').filter(amount__gt=F('amount_paid'))
+    attendance_today = Attendance.objects.filter(chess_class__date=today)
     context = {
-        "active_students": Student.objects.filter(status="active").count(),
-        "new_enquiries": Enquiry.objects.filter(status="new").count(),
-        "today_classes": ChessClass.objects.filter(date=today, status="scheduled"),
-        "upcoming_classes": ChessClass.objects.filter(date__gt=today, status="scheduled").order_by("date", "start_time")[:5],
-        "pending_invoices": Invoice.objects.filter(status__in=["pending", "partially_paid"]),
-        "overdue_invoices": Invoice.objects.filter(status="overdue"),
-        "recent_payments": Payment.objects.order_by("-payment_date", "-created_at")[:5],
-        "upcoming_reminders": PaymentReminder.objects.filter(status="pending", scheduled_date__gte=today).order_by("scheduled_date")[:5],
-        "follow_up_enquiries": Enquiry.objects.filter(status="follow_up", follow_up_date__lte=today),
-        "fees_collected_month": Payment.objects.filter(
-            payment_date__year=today.year, payment_date__month=today.month
-        ).aggregate(total=Sum("amount"))["total"] or 0,
-        "pending_fees_total": Invoice.objects.filter(
-            status__in=["pending", "partially_paid", "overdue"]
-        ).aggregate(total=Sum("amount") - Sum("amount_paid"))["total"] or 0,
-        "low_attendance_students": [],
+        'active_students': Student.objects.filter(status='active').count(),
+        'new_enquiries': Enquiry.objects.filter(status='new').count(),
+        'pending_fees_total': unpaid.aggregate(total=Sum(
+            F('amount') - F('amount_paid'), output_field=DecimalField(max_digits=12, decimal_places=2)
+        ))['total'] or 0,
+        'tests_recorded': TestResult.objects.count(),
+        'upcoming_test': ScheduledTest.objects.filter(date__gte=today).first(),
+        'next_lesson': ChessClass.objects.filter(date__gte=today, status='scheduled').order_by('date', 'start_time').first(),
+        'attendance_marked_today': attendance_today.count(),
+        'attendance_present_today': attendance_today.filter(status__in=['present', 'late']).count(),
+        'parent_count': Parent.objects.count(),
+        'recent_enquiries': Enquiry.objects.order_by('-created_at')[:4],
+        'upcoming_test_count': ScheduledTest.objects.filter(date__gte=today).count(),
     }
-
-    # Low attendance - students with < 70% in last 30 days
-    active_students = Student.objects.filter(status="active")
-    low_att = []
-    for s in active_students:
-        records = Attendance.objects.filter(student=s, chess_class__date__gte=today - timedelta(days=30))
-        total = records.count()
-        if total >= 3:
-            present = records.filter(status__in=["present", "late"]).count()
-            pct = round(present / total * 100)
-            if pct < 70:
-                low_att.append({"student": s, "percentage": pct})
-    context["low_attendance_students"] = low_att
-
-    return render(request, "core/dashboard.html", context)
+    return render(request, 'core/dashboard_academy.html', context)
 
 
 @coach_required

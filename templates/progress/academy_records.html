@@ -3,6 +3,13 @@
 {% block page_subtitle %}Academy syllabus and verified student results{% endblock %}
 {% block content %}
 <div class="card mb-4">
+  <div class="card-header d-flex justify-content-between"><span>Upcoming tests</span><a class="btn btn-primary btn-sm" href="{% url 'progress:academy_add' 'schedule' %}">Schedule test</a></div>
+  <div class="card-body">
+    {% for test in scheduled_tests %}<div class="py-2 border-bottom"><a href="{% url 'progress:academy_edit' 'schedule' test.pk %}">{{ test.title }}</a> · {{ test.get_level_display }} · {{ test.date|date:'d M Y' }}{% if test.batch %} · {{ test.batch.name }}{% endif %}</div>
+    {% empty %}<p class="text-muted mb-0">No tests scheduled.</p>{% endfor %}
+  </div>
+</div>
+<div class="card mb-4">
   <div class="card-header d-flex justify-content-between"><span>Course syllabus</span><a class="btn btn-primary btn-sm" href="{% url 'progress:academy_add' 'lesson' %}">Add lesson</a></div>
   <div class="card-body">
     {% for lesson in lessons %}

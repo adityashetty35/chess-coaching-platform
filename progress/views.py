@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django import forms
 from core.decorators import coach_required
-from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord
-from .forms import ProgressEntryForm, GoalForm, SyllabusLessonForm, TestResultForm, FideRatingRecordForm
+from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord, ScheduledTest
+from .forms import ProgressEntryForm, GoalForm, SyllabusLessonForm, TestResultForm, FideRatingRecordForm, ScheduledTestForm
 from students.models import Student
 
 @coach_required
@@ -94,6 +94,7 @@ def academy_records(request):
         'lessons': SyllabusLesson.objects.all(),
         'tests': TestResult.objects.select_related('student')[:40],
         'ratings': FideRatingRecord.objects.select_related('student', 'verified_by')[:40],
+        'scheduled_tests': ScheduledTest.objects.select_related('batch').all()[:40],
     })
 
 
@@ -103,6 +104,7 @@ def academy_record_form(request, kind, pk=None):
         'lesson': (SyllabusLesson, SyllabusLessonForm),
         'test': (TestResult, TestResultForm),
         'fide': (FideRatingRecord, FideRatingRecordForm),
+        'schedule': (ScheduledTest, ScheduledTestForm),
     }
     if kind not in config:
         from django.http import Http404
@@ -121,5 +123,5 @@ def academy_record_form(request, kind, pk=None):
         if not isinstance(field.widget, forms.CheckboxInput):
             field.widget.attrs.setdefault('class', 'form-select' if isinstance(field.widget, forms.Select) else 'form-control')
     return render(request, 'progress/academy_record_form.html', {
-        'form': form, 'title': {'lesson': 'Syllabus lesson', 'test': 'Test result', 'fide': 'Verified FIDE rating'}[kind],
+        'form': form, 'title': {'lesson': 'Syllabus lesson', 'test': 'Test result', 'fide': 'Verified FIDE rating', 'schedule': 'Upcoming test'}[kind],
     })

@@ -1,5 +1,12 @@
 from django import forms
-from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord
+from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord, ScheduledTest
+
+
+class ScheduledTestForm(forms.ModelForm):
+    class Meta:
+        model = ScheduledTest
+        fields = ['title', 'level', 'date', 'batch', 'details']
+        widgets = {'date': forms.DateInput(attrs={'type': 'date'})}
 
 
 class SyllabusLessonForm(forms.ModelForm):

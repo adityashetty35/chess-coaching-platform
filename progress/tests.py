@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse, resolve, Resolver404
 from students.models import Student, Parent
-from .models import SyllabusLesson, TestResult, FideRatingRecord
+from .models import SyllabusLesson, TestResult, FideRatingRecord, ScheduledTest
+from fees.models import Invoice
+from enquiries.models import Enquiry
 
 
 class AcademyScopeTests(TestCase):
@@ -44,3 +46,27 @@ class AcademyScopeTests(TestCase):
         for path in ['/tournaments/', '/announcements/', '/reports/']:
             with self.assertRaises(Resolver404):
                 resolve(path)
+
+    def test_dashboard_uses_live_database_values(self):
+        Invoice.objects.create(student=self.mine, description='Monthly fee', amount=2500,
+                               amount_paid=500, due_date=date.today(), status='partially_paid')
+        Enquiry.objects.create(student_name='Real applicant', phone='9876543210', status='new')
+        ScheduledTest.objects.create(title='Upcoming assessment', level='foundation', date=date.today())
+        self.client.force_login(self.coach)
+        response = self.client.get(reverse('core:dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['active_students'], 2)
+        self.assertEqual(response.context['new_enquiries'], 1)
+        self.assertEqual(response.context['pending_fees_total'], 2000)
+        self.assertEqual(response.context['tests_recorded'], 2)
+        self.assertContains(response, 'Upcoming assessment')
+        self.assertContains(response, '₹2,000')
+        self.assertNotContains(response, 'Sample data')
+
+    def test_dashboard_without_records_displays_empty_states(self):
+        ScheduledTest.objects.all().delete()
+        self.client.force_login(self.coach)
+        response = self.client.get(reverse('core:dashboard'))
+        self.assertContains(response, 'No upcoming tests scheduled.')
+        self.assertContains(response, 'No lessons scheduled.')
+        self.assertContains(response, 'No enquiries recorded yet.')

@@ -34,10 +34,7 @@ pip install -r requirements.txt
 echo "🗄️ Running migrations..."
 python manage.py migrate
 
-# 4. Load realistic demo data (coach, students, attendance, fees, etc.)
-echo "♟️ Loading demo data..."
-python manage.py load_demo_data
-
+# 4. Never seed sample students or fees into a live academy database.
 # 5. Collect static assets
 echo "🎨 Collecting static files..."
 python manage.py collectstatic --noinput

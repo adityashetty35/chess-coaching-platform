@@ -1,0 +1,98 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block page_title %}Academy dashboard{% endblock %}
+{% block page_subtitle %}Indian Chess Raider Academy · Live records{% endblock %}
+
+{% block content %}
+<div class="academy-dashboard">
+  <div class="academy-dashboard-intro mb-4">
+    <div>
+      <div class="eyebrow mb-2">ADMIN CONTROL CENTRE</div>
+      <h1>Welcome, Coach Asfar!</h1>
+      <p class="text-muted mb-0">Your academy at a glance. All figures are calculated from saved records.</p>
+    </div>
+    <span class="academy-live-label"><i class="bi bi-database-check"></i> Live database</span>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><a href="{% url 'students:list' %}" class="academy-stat">
+      <span class="academy-stat-icon"><i class="bi bi-people"></i></span>
+      <span class="academy-stat-label">Enrolled students</span><strong>{{ active_students }}</strong><span class="academy-stat-foot">Active enrollments</span>
+    </a></div>
+    <div class="col-6 col-xl-3"><a href="{% url 'enquiries:list' %}" class="academy-stat">
+      <span class="academy-stat-icon"><i class="bi bi-chat-left-text"></i></span>
+      <span class="academy-stat-label">New enquiries</span><strong>{{ new_enquiries }}</strong><span class="academy-stat-foot">Awaiting follow-up</span>
+    </a></div>
+    <div class="col-6 col-xl-3"><a href="{% url 'fees:invoice_list' %}" class="academy-stat">
+      <span class="academy-stat-icon"><i class="bi bi-wallet2"></i></span>
+      <span class="academy-stat-label">Fees pending</span><strong>₹{{ pending_fees_total|floatformat:0|intcomma }}</strong><span class="academy-stat-foot">Outstanding balance</span>
+    </a></div>
+    <div class="col-6 col-xl-3"><a href="{% url 'progress:academy_records' %}" class="academy-stat">
+      <span class="academy-stat-icon"><i class="bi bi-clipboard-check"></i></span>
+      <span class="academy-stat-label">Tests recorded</span><strong>{{ tests_recorded }}</strong><span class="academy-stat-foot">Academy assessments</span>
+    </a></div>
+  </div>
+
+  <div class="card academy-dashboard-card mb-4">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div><div class="eyebrow">SELECT A SECTION</div><h2 class="academy-section-title mb-0">Manage your academy</h2></div>
+      </div>
+      <div class="academy-section-grid">
+        <a href="{% url 'core:dashboard' %}" class="academy-section-link active"><i class="bi bi-grid-1x2"></i><span>Dashboard</span></a>
+        <a href="{% url 'enquiries:list' %}" class="academy-section-link"><i class="bi bi-inbox"></i><span>Enquiries</span></a>
+        <a href="{% url 'students:list' %}" class="academy-section-link"><i class="bi bi-people"></i><span>Students</span></a>
+        <a href="{% url 'fees:invoice_list' %}" class="academy-section-link"><i class="bi bi-currency-rupee"></i><span>Fees</span></a>
+        <a href="{% url 'progress:academy_records' %}" class="academy-section-link"><i class="bi bi-journal-bookmark"></i><span>Lessons</span></a>
+        <a href="{% url 'progress:academy_records' %}" class="academy-section-link"><i class="bi bi-patch-check"></i><span>Tests</span></a>
+        <a href="{% url 'coaching:class_list' %}" class="academy-section-link"><i class="bi bi-calendar-check"></i><span>Attendance</span></a>
+        <a href="{% url 'students:parent_list' %}" class="academy-section-link"><i class="bi bi-person-hearts"></i><span>Parents</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6"><div class="card academy-dashboard-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3"><h2 class="academy-section-title mb-0">Upcoming test</h2><span class="academy-detail-icon"><i class="bi bi-clipboard2-check"></i></span></div>
+        {% if upcoming_test %}
+          <h3 class="academy-item-title">{{ upcoming_test.title }}</h3>
+          <p class="mb-2 text-muted">{{ upcoming_test.date|date:'l, d F Y' }} · {{ upcoming_test.get_level_display }}</p>
+          {% if upcoming_test.batch %}<p class="mb-2">{{ upcoming_test.batch.name }}</p>{% endif %}
+          {% if upcoming_test.details %}<p class="mb-0">{{ upcoming_test.details }}</p>{% endif %}
+        {% else %}<div class="academy-empty"><i class="bi bi-calendar-plus"></i><p>No upcoming tests scheduled.</p><a href="{% url 'progress:academy_add' 'schedule' %}">Schedule a test</a></div>{% endif %}
+      </div>
+    </div></div>
+    <div class="col-lg-6"><div class="card academy-dashboard-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3"><h2 class="academy-section-title mb-0">Next lesson</h2><span class="academy-detail-icon"><i class="bi bi-book"></i></span></div>
+        {% if next_lesson %}
+          <h3 class="academy-item-title">{{ next_lesson.title|default:next_lesson.topic|default:'Chess lesson' }}</h3>
+          <p class="mb-2 text-muted">{{ next_lesson.date|date:'l, d F Y' }} · {{ next_lesson.start_time|time:'g:i A' }}</p>
+          {% if next_lesson.topic %}<p class="mb-2">Topic: {{ next_lesson.topic }}</p>{% endif %}
+          <a href="{% url 'coaching:class_detail' next_lesson.pk %}">View lesson details</a>
+        {% else %}<div class="academy-empty"><i class="bi bi-journal-plus"></i><p>No lessons scheduled.</p><a href="{% url 'coaching:class_add' %}">Schedule a lesson</a></div>{% endif %}
+      </div>
+    </div></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6"><div class="card academy-dashboard-card h-100"><div class="card-body">
+      <h2 class="academy-section-title mb-3">Quick actions</h2>
+      <div class="academy-actions">
+        <a href="{% url 'enquiries:add' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Add enquiry</a>
+        <a href="{% url 'students:add' %}" class="btn btn-outline-primary"><i class="bi bi-person-plus me-2"></i>Add student</a>
+      </div>
+      <div class="academy-microstat mt-4"><span>Attendance marked today</span><strong>{{ attendance_present_today }} / {{ attendance_marked_today }}</strong></div>
+      <div class="academy-microstat"><span>Parent records</span><strong>{{ parent_count }}</strong></div>
+      <div class="academy-microstat"><span>Upcoming tests</span><strong>{{ upcoming_test_count }}</strong></div>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card academy-dashboard-card h-100"><div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="academy-section-title mb-0">Recent enquiries</h2><a class="small" href="{% url 'enquiries:list' %}">View all</a></div>
+      {% for enquiry in recent_enquiries %}<a href="{% url 'enquiries:detail' enquiry.pk %}" class="academy-enquiry-row"><span><strong>{{ enquiry.student_name }}</strong><small>{{ enquiry.created_at|date:'d M Y' }} · {{ enquiry.get_status_display }}</small></span><i class="bi bi-chevron-right"></i></a>
+      {% empty %}<div class="academy-empty"><i class="bi bi-inbox"></i><p>No enquiries recorded yet.</p></div>{% endfor %}
+    </div></div></div>
+  </div>
+</div>
+{% endblock %}

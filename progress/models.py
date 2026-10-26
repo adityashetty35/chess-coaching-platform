@@ -114,3 +114,17 @@ class FideRatingRecord(models.Model):
 
     def __str__(self):
         return f"{self.student}: {self.rating} (verified)"
+
+
+class ScheduledTest(models.Model):
+    title = models.CharField(max_length=200)
+    level = models.CharField(max_length=20, choices=SyllabusLesson.LEVEL_CHOICES)
+    date = models.DateField()
+    details = models.TextField(blank=True)
+    batch = models.ForeignKey('coaching.Batch', on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['date', 'id']
+
+    def __str__(self):
+        return f'{self.title} - {self.date}'
