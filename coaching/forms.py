@@ -1,6 +1,9 @@
 from django import forms
 from .models import Batch, ChessClass, Attendance
 from students.models import Student
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+from core.models import UserRole
 
 class BatchForm(forms.ModelForm):
     class Meta:
@@ -30,7 +33,7 @@ class ChessClassForm(forms.ModelForm):
     class Meta:
         model = ChessClass
         fields = [
-            'title', 'class_type', 'mode', 'batch', 'students',
+            'title', 'class_type', 'mode', 'batch', 'students', 'assigned_coach',
             'date', 'start_time', 'end_time', 'topic', 'description', 
             'homework', 'coach_notes', 'status'
         ]
@@ -47,6 +50,8 @@ class ChessClassForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['students'].queryset = Student.objects.filter(status='active')
+        self.fields['assigned_coach'].queryset = get_user_model().objects.filter(
+            Q(academy_role__role=UserRole.COACH) | Q(is_superuser=True), is_active=True).distinct()
         for field in self.fields.values():
             if isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.setdefault('class', 'form-control')

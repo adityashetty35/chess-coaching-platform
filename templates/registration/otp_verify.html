@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Verify parent login{% endblock %}
+{% block body_class %}login-page{% endblock %}
+{% block body %}<div class="login-card"><div class="text-center mb-4"><div class="login-mark">♔</div><h2>Verify your number</h2><p class="login-subtitle">Enter the code sent to your phone.</p></div>
+{% for message in messages %}<div class="alert alert-danger">{{ message }}</div>{% endfor %}
+<form method="post">{% csrf_token %}<label class="form-label" for="code">Verification code</label><input class="form-control mb-3" name="code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required><button class="btn btn-primary w-100" type="submit">Verify &amp; sign in</button></form>
+<div class="text-center mt-3"><a href="{% url 'accounts:otp_login' %}">Request a new code</a></div></div>{% endblock %}

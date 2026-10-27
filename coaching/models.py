@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 class Batch(models.Model):
     MODE_CHOICES = [
@@ -36,6 +37,8 @@ class Batch(models.Model):
 
 
 class ChessClass(models.Model):
+    assigned_coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+                                       blank=True, null=True, related_name='assigned_chess_classes')
     CLASS_TYPE_CHOICES = [
         ('individual', 'Individual'),
         ('group', 'Group'),

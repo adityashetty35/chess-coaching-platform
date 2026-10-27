@@ -19,7 +19,7 @@
                 <i class="bi bi-person-circle fs-4"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url 'settings:index' %}"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                {% if request.user.is_superuser %}<li><a class="dropdown-item" href="{% url 'settings:index' %}"><i class="bi bi-gear me-2"></i>Settings</a></li>{% endif %}
                 <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}"><i class="bi bi-key me-2"></i>Change Password</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Log out</button></form></li>
@@ -46,49 +46,69 @@
                     <i class="bi bi-grid-1x2"></i><span>Dashboard</span>
                 </a>
             </li>
+            {% if academy_access.enquiries %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'enquiries' %}active{% endif %}" href="{% url 'enquiries:list' %}">
                     <i class="bi bi-inbox"></i><span>Enquiries</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.students %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'students' %}active{% endif %}" href="{% url 'students:list' %}">
                     <i class="bi bi-people"></i><span>Students</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.lessons or academy_access.attendance %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'coaching' and 'batch' not in request.path %}active{% endif %}" href="{% url 'coaching:class_list' %}">
                     <i class="bi bi-calendar-event"></i><span>Lessons &amp; Attendance</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.batches %}
             <li class="nav-item">
                 <a class="nav-link {% if 'batch' in request.path %}active{% endif %}" href="{% url 'coaching:batch_list' %}">
                     <i class="bi bi-collection"></i><span>Batches</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.fees %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'fees' %}active{% endif %}" href="{% url 'fees:invoice_list' %}">
                     <i class="bi bi-currency-rupee"></i><span>Fees</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.progress %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'progress' %}active{% endif %}" href="{% url 'progress:academy_records' %}">
                     <i class="bi bi-journal-bookmark"></i><span>Syllabus &amp; Tests</span>
                 </a>
             </li>
+            {% endif %}
+            {% if academy_access.homework %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'assignments' %}active{% endif %}" href="{% url 'assignments:list' %}">
                     <i class="bi bi-journal-check"></i><span>Homework</span>
                 </a>
             </li>
+            {% endif %}
         </ul>
         <div class="sidebar-divider"></div>
         <ul class="nav flex-column">
+            {% if request.user.is_superuser %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'administration:users' %}"><i class="bi bi-person-gear"></i><span>Users &amp; Roles</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'administration:integrations' %}"><i class="bi bi-chat-dots"></i><span>WhatsApp &amp; OTP</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'administration:deliveries' %}"><i class="bi bi-send-check"></i><span>Delivery logs</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'administration:audit' %}"><i class="bi bi-shield-check"></i><span>Audit logs</span></a></li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.app_name == 'settings' %}active{% endif %}" href="{% url 'settings:index' %}">
                     <i class="bi bi-gear"></i><span>Settings</span>
                 </a>
             </li>
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'website:home' %}" target="_blank">
                     <i class="bi bi-globe"></i><span>View Website</span>
@@ -122,7 +142,7 @@
                         <i class="bi bi-person-circle me-1"></i>{{ request.user.get_full_name|default:request.user.username }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'settings:index' %}"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        {% if request.user.is_superuser %}<li><a class="dropdown-item" href="{% url 'settings:index' %}"><i class="bi bi-gear me-2"></i>Settings</a></li>{% endif %}
                         <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}"><i class="bi bi-key me-2"></i>Change Password</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Log out</button></form></li>

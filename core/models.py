@@ -1,6 +1,103 @@
 import json
 
 from django.db import models
+from django.conf import settings
+
+
+class UserRole(models.Model):
+    SUPER_ADMIN = 'super_admin'
+    ACADEMY_ADMIN = 'academy_admin'
+    COACH = 'coach'
+    PARENT = 'parent'
+    ROLE_CHOICES = [(SUPER_ADMIN, 'Super Administrator'), (ACADEMY_ADMIN, 'Academy Admin'),
+                    (COACH, 'Coach'), (PARENT, 'Parent')]
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='academy_role')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=PARENT)
+    permissions = models.JSONField(default=list, blank=True, help_text='Enabled Academy Admin modules')
+
+    def __str__(self):
+        return f'{self.user.username} — {self.get_role_display()}'
+
+
+class IntegrationSettings(models.Model):
+    WHATSAPP_CHOICES = [('disabled', 'Disabled'), ('twilio', 'Twilio WhatsApp')]
+    SMS_CHOICES = [('disabled', 'Disabled'), ('twilio_verify', 'Twilio Verify')]
+    whatsapp_provider = models.CharField(max_length=24, choices=WHATSAPP_CHOICES, default='disabled')
+    whatsapp_sender = models.CharField(max_length=32, blank=True, default='', help_text='Twilio approved WhatsApp sender, e.g. +14155238886')
+    whatsapp_content_sid = models.CharField(max_length=50, blank=True, default='', help_text='Approved Twilio Content template SID for business-initiated reminders')
+    whatsapp_template = models.TextField(default='Hello {parent_name}, fees of {amount} for {student_name} are due on {due_date}.')
+    reminder_days_before = models.PositiveSmallIntegerField(default=3)
+    reminders_enabled = models.BooleanField(default=False)
+    sms_provider = models.CharField(max_length=24, choices=SMS_CHOICES, default='disabled')
+    parent_otp_enabled = models.BooleanField(default=False)
+    otp_cooldown_seconds = models.PositiveSmallIntegerField(default=60)
+    otp_max_attempts = models.PositiveSmallIntegerField(default=5)
+
+    @classmethod
+    def load(cls):
+        return cls.objects.get_or_create(pk=1)[0]
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        return super().save(*args, **kwargs)
+
+
+class WhatsAppTemplate(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    content_sid = models.CharField(max_length=50, help_text='Twilio-approved WhatsApp Content SID')
+    preview_text = models.TextField(default='Hello {parent_name}, fees of {amount} for {student_name} are due on {due_date}.')
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ReminderSchedule(models.Model):
+    name = models.CharField(max_length=100)
+    days_offset = models.SmallIntegerField(default=-3, help_text='Days relative to due date: -3 is 3 days before; 0 is on due date; 2 is 2 days after.')
+    template = models.ForeignKey(WhatsAppTemplate, on_delete=models.PROTECT, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['days_offset', 'id']
+
+    def __str__(self):
+        return self.name
+
+
+class DeliveryLog(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    recipient = models.CharField(max_length=32)
+    message_type = models.CharField(max_length=32, default='fee_reminder')
+    invoice = models.ForeignKey('fees.Invoice', null=True, blank=True, on_delete=models.SET_NULL)
+    scheduled_for = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, default='pending')
+    provider_id = models.CharField(max_length=100, blank=True, default='')
+    error = models.CharField(max_length=300, blank=True, default='')
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [models.UniqueConstraint(fields=['invoice', 'message_type', 'scheduled_for'],
+                                               name='unique_reminder_delivery_per_date')]
+
+
+class OTPRequest(models.Model):
+    phone = models.CharField(max_length=20)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    consumed = models.BooleanField(default=False)
+
+
+class AuditLog(models.Model):
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    action = models.CharField(max_length=100)
+    target = models.CharField(max_length=160)
+    details = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
 class SiteSettings(models.Model):
     academy_name = models.CharField(max_length=200, default='Chess Academy')

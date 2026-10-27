@@ -15,6 +15,7 @@ urlpatterns = [
     path('assignments/', include('assignments.urls')),
     path('portal/', include('portal.urls')),
     path('settings/', include('core.settings_urls')),
+    path('administration/', include('core.administration_urls')),
     path('', include('website.urls')),
 ]
 

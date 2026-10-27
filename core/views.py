@@ -14,24 +14,42 @@ def dashboard(request):
     from progress.models import TestResult, ScheduledTest
     from django.utils import timezone
     from django.db.models import Sum, F, DecimalField
+    from django.db.models import Q
+    from core.permissions import role_for, has_module
+    from core.models import UserRole
+
+    if role_for(request.user) == UserRole.COACH:
+        today = timezone.now().date()
+        assigned = ChessClass.objects.filter(assigned_coach=request.user)
+        records = Attendance.objects.filter(chess_class__assigned_coach=request.user, chess_class__date=today)
+        return render(request, 'core/dashboard_academy.html', {
+            'active_students': Student.objects.filter(
+                Q(classes__assigned_coach=request.user) | Q(batch__classes__assigned_coach=request.user),
+                status='active').distinct().count(),
+            'new_enquiries': 0, 'pending_fees_total': 0, 'tests_recorded': 0,
+            'next_lesson': assigned.filter(date__gte=today, status='scheduled').order_by('date', 'start_time').first(),
+            'attendance_marked_today': records.count(),
+            'attendance_present_today': records.filter(status__in=['present', 'late']).count(),
+            'parent_count': 0, 'recent_enquiries': [], 'upcoming_test_count': 0,
+        })
 
     today = timezone.now().date()
     unpaid = Invoice.objects.exclude(status='cancelled').filter(amount__gt=F('amount_paid'))
     attendance_today = Attendance.objects.filter(chess_class__date=today)
     context = {
-        'active_students': Student.objects.filter(status='active').count(),
-        'new_enquiries': Enquiry.objects.filter(status='new').count(),
-        'pending_fees_total': unpaid.aggregate(total=Sum(
+        'active_students': Student.objects.filter(status='active').count() if has_module(request.user, 'students') else 0,
+        'new_enquiries': Enquiry.objects.filter(status='new').count() if has_module(request.user, 'enquiries') else 0,
+        'pending_fees_total': (unpaid.aggregate(total=Sum(
             F('amount') - F('amount_paid'), output_field=DecimalField(max_digits=12, decimal_places=2)
-        ))['total'] or 0,
-        'tests_recorded': TestResult.objects.count(),
-        'upcoming_test': ScheduledTest.objects.filter(date__gte=today).first(),
-        'next_lesson': ChessClass.objects.filter(date__gte=today, status='scheduled').order_by('date', 'start_time').first(),
-        'attendance_marked_today': attendance_today.count(),
-        'attendance_present_today': attendance_today.filter(status__in=['present', 'late']).count(),
-        'parent_count': Parent.objects.count(),
-        'recent_enquiries': Enquiry.objects.order_by('-created_at')[:4],
-        'upcoming_test_count': ScheduledTest.objects.filter(date__gte=today).count(),
+        ))['total'] or 0) if has_module(request.user, 'fees') else 0,
+        'tests_recorded': TestResult.objects.count() if has_module(request.user, 'progress') else 0,
+        'upcoming_test': ScheduledTest.objects.filter(date__gte=today).first() if has_module(request.user, 'progress') else None,
+        'next_lesson': ChessClass.objects.filter(date__gte=today, status='scheduled').order_by('date', 'start_time').first() if has_module(request.user, 'lessons') else None,
+        'attendance_marked_today': attendance_today.count() if has_module(request.user, 'lessons') else 0,
+        'attendance_present_today': attendance_today.filter(status__in=['present', 'late']).count() if has_module(request.user, 'lessons') else 0,
+        'parent_count': Parent.objects.count() if has_module(request.user, 'students') else 0,
+        'recent_enquiries': Enquiry.objects.order_by('-created_at')[:4] if has_module(request.user, 'enquiries') else [],
+        'upcoming_test_count': ScheduledTest.objects.filter(date__gte=today).count() if has_module(request.user, 'progress') else 0,
     }
     return render(request, 'core/dashboard_academy.html', context)
 
@@ -42,7 +60,11 @@ def settings_view(request):
     settings = SiteSettings.load()
     form = AcademySettingsForm(request.POST or None, request.FILES or None, instance=settings)
     if request.method == "POST" and form.is_valid():
+        from .models import AuditLog
+        before = {key: getattr(settings, key) for key in form.cleaned_data}
         form.save()
+        AuditLog.objects.create(actor=request.user, action='academy_settings_changed', target='Academy settings',
+                                details={'before': before, 'after': {key: getattr(settings, key) for key in form.cleaned_data}})
         messages.success(request, "Settings updated successfully.")
         return redirect("settings:index")
     return render(request, "core/settings_academy.html", {"form": form})

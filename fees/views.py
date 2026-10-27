@@ -216,14 +216,14 @@ def whatsapp_reminder(request, invoice_pk):
     
     wa_url = f'https://wa.me/{whatsapp_num.replace("+","").replace(" ","")}?text={urllib.parse.quote(message)}'
     
-    # Optional: Log the reminder
+    # Opening WhatsApp does not establish that a message was sent.
     PaymentReminder.objects.create(
         invoice=invoice,
         reminder_type='whatsapp',
         scheduled_date=timezone.now().date(),
         message=message,
-        status='sent',
-        sent_at=timezone.now()
+        status='pending',
+        notes='Manual WhatsApp link opened; delivery not confirmed.'
     )
     
     return redirect(wa_url)

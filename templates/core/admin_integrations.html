@@ -1,0 +1,24 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}Integrations &amp; verification{% endblock %}
+{% block page_subtitle %}WhatsApp reminders and parent SMS login{% endblock %}
+{% block content %}
+<div class="alert alert-info"><i class="bi bi-shield-lock me-2"></i>API secrets are never entered or displayed here. Set <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code> and <code>TWILIO_VERIFY_SERVICE_SID</code> on the server. Changes below do not send messages automatically until the scheduled command is configured.</div>
+<div class="row g-3 mb-3"><div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><h6>WhatsApp credentials</h6>{% if whatsapp_ready %}<span class="badge bg-success">Present</span>{% else %}<span class="badge bg-warning text-dark">Missing</span>{% endif %}</div></div></div><div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><h6>SMS Verify credentials</h6>{% if otp_ready %}<span class="badge bg-success">Present</span>{% else %}<span class="badge bg-warning text-dark">Missing</span>{% endif %}</div></div></div></div>
+<div class="card border-0 shadow-sm"><div class="card-body p-4"><form method="post">{% csrf_token %}
+{% for error in form.non_field_errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+<h5 class="mb-3">WhatsApp &amp; reminders</h5>
+<div class="row g-3">{% for field in form %}{% if field.name == 'sms_provider' %}</div><hr class="my-4"><h5 class="mb-3">Parent OTP authentication</h5><div class="row g-3">{% endif %}
+<div class="{% if field.name == 'whatsapp_template' %}col-12{% else %}col-md-6{% endif %}">{% if field.field.widget.input_type == 'checkbox' %}<div class="form-check mt-3">{{ field }}<label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label></div>{% else %}<label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endif %}
+{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}</div>
+<div class="form-text mt-3">Approved Twilio content templates are required for business-initiated WhatsApp reminders. The reminder template text is for admin preview; approved content is configured in Twilio.</div>
+<button type="submit" class="btn btn-primary mt-4">Save integration settings</button>
+</form></div></div>
+<div class="row g-3 mt-1">
+<div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Approved message templates</h5><a class="btn btn-outline-primary btn-sm" href="{% url 'administration:template_new' %}">Add template</a></div>
+<p class="small text-muted">Each template links to a pre-approved Twilio WhatsApp Content SID.</p>
+{% for template in templates %}<div class="border-top py-2 d-flex justify-content-between gap-2"><div><strong>{{ template.name }}</strong>{% if not template.is_active %} <span class="badge bg-secondary">Disabled</span>{% endif %}<div class="small text-muted">{{ template.content_sid }}</div></div><a class="btn btn-light btn-sm align-self-center" href="{% url 'administration:template_edit' template.pk %}">Edit</a></div>{% empty %}<div class="text-muted">No templates created yet; the legacy Content SID setting above will be used.</div>{% endfor %}
+</div></div></div>
+<div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Reminder schedules</h5><a class="btn btn-outline-primary btn-sm" href="{% url 'administration:schedule_new' %}">Add schedule</a></div>
+<p class="small text-muted">Run the reminder command daily to send on configured dates.</p>
+{% for schedule in schedules %}<div class="border-top py-2 d-flex justify-content-between gap-2"><div><strong>{{ schedule.name }}</strong>{% if not schedule.is_active %} <span class="badge bg-secondary">Disabled</span>{% endif %}<div class="small text-muted">{% if schedule.days_offset < 0 %}{{ schedule.days_offset|cut:'-' }} days before due{% elif schedule.days_offset == 0 %}On due date{% else %}{{ schedule.days_offset }} days after due{% endif %} · {{ schedule.template.name|default:'Default template' }}</div></div><a class="btn btn-light btn-sm align-self-center" href="{% url 'administration:schedule_edit' schedule.pk %}">Edit</a></div>{% empty %}<div class="text-muted">No schedules created yet; the default reminder timing above will be used.</div>{% endfor %}
+</div></div></div></div>{% endblock %}

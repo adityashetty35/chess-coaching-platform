@@ -4,10 +4,22 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Count, Q
 from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 from core.decorators import coach_required
+from core.permissions import role_for
+from core.models import UserRole
 
 from .models import Batch, ChessClass, Attendance
 from .forms import BatchForm, ChessClassForm
+
+
+def visible_classes(user):
+    classes = ChessClass.objects.all()
+    return classes.filter(assigned_coach=user) if role_for(user) == UserRole.COACH else classes
+
+
+def class_for_user(request, pk):
+    return get_object_or_404(visible_classes(request.user), pk=pk)
 
 @coach_required
 def batch_list(request):
@@ -43,7 +55,7 @@ def batch_delete(request, pk):
 
 @coach_required
 def class_list(request):
-    classes = ChessClass.objects.all().select_related('batch')
+    classes = visible_classes(request.user).select_related('batch', 'assigned_coach')
     
     # Filter
     date_filter = request.GET.get('date', 'all')
@@ -74,8 +86,10 @@ def class_list(request):
 
 @coach_required
 def class_form(request, pk=None):
+    if not pk and role_for(request.user) == UserRole.COACH:
+        raise PermissionDenied('Only administrators can schedule and assign new classes.')
     if pk:
-        chess_class = get_object_or_404(ChessClass, pk=pk)
+        chess_class = class_for_user(request, pk)
         title = 'Edit Class'
     else:
         chess_class = None
@@ -83,17 +97,31 @@ def class_form(request, pk=None):
 
     if request.method == 'POST':
         form = ChessClassForm(request.POST, instance=chess_class)
+        if role_for(request.user) == UserRole.COACH:
+            form.fields.pop('assigned_coach')
+            form.instance.assigned_coach = request.user
+            if chess_class:
+                form.fields['students'].queryset = chess_class.students.all()
+                form.fields['batch'].queryset = Batch.objects.filter(pk=chess_class.batch_id)
         if form.is_valid():
-            form.save()
+            saved = form.save(commit=False)
+            if role_for(request.user) == UserRole.COACH:
+                saved.assigned_coach = request.user
+            saved.save()
+            form.save_m2m()
             messages.success(request, 'Class saved successfully.')
             return redirect('coaching:class_list')
     else:
         form = ChessClassForm(instance=chess_class)
+        if role_for(request.user) == UserRole.COACH:
+            form.fields.pop('assigned_coach')
+            form.fields['students'].queryset = chess_class.students.all()
+            form.fields['batch'].queryset = Batch.objects.filter(pk=chess_class.batch_id)
     return render(request, 'coaching/class_form.html', {'form': form, 'title': title, 'back_url': 'coaching:class_list'})
 
 @coach_required
 def class_detail(request, pk):
-    chess_class = get_object_or_404(ChessClass, pk=pk)
+    chess_class = class_for_user(request, pk)
     
     if chess_class.batch:
         students = chess_class.batch.students.filter(status='active')
@@ -119,7 +147,7 @@ def class_detail(request, pk):
 
 @coach_required
 def class_delete(request, pk):
-    chess_class = get_object_or_404(ChessClass, pk=pk)
+    chess_class = class_for_user(request, pk)
     if request.method == 'POST':
         chess_class.delete()
         messages.success(request, 'Class deleted successfully.')
@@ -127,7 +155,7 @@ def class_delete(request, pk):
 
 @coach_required
 def mark_attendance(request, pk):
-    chess_class = get_object_or_404(ChessClass, pk=pk)
+    chess_class = class_for_user(request, pk)
     
     if chess_class.batch:
         students = chess_class.batch.students.filter(status='active')
@@ -173,7 +201,7 @@ def calendar_events(request):
     start = request.GET.get('start')
     end = request.GET.get('end')
     
-    classes = ChessClass.objects.all()
+    classes = visible_classes(request.user)
     if start:
         classes = classes.filter(date__gte=start)
     if end:

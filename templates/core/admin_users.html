@@ -1,0 +1,14 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}Users &amp; roles{% endblock %}
+{% block page_subtitle %}Control who can access each part of the academy{% endblock %}
+{% block page_actions %}<a class="btn btn-primary btn-sm" href="{% url 'administration:user_new' %}"><i class="bi bi-person-plus me-1"></i>Create user</a>{% endblock %}
+{% block content %}
+<div class="card shadow-sm border-0"><div class="card-body">
+<p class="text-muted mb-3">Super Administrator has full control. Academy Admin permissions are selected individually. Coaches work with assigned classes. Parents see linked children only.</p>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody>
+{% for person in records %}<tr><td><strong>{{ person.get_full_name|default:person.username }}</strong><div class="small text-muted">{{ person.username }}{% if person.email %} · {{ person.email }}{% endif %}</div></td>
+<td>{% if person.is_superuser %}<span class="badge bg-primary">Super Administrator</span>{% elif person.academy_role %}{{ person.academy_role.get_role_display }}{% elif person.is_staff %}Academy Admin (legacy){% else %}Parent{% endif %}</td>
+<td>{% if person.is_active %}<span class="badge bg-success-subtle text-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+<td class="text-end"><a class="btn btn-outline-primary btn-sm" href="{% url 'administration:user_edit' person.pk %}">Manage</a></td></tr>
+{% empty %}<tr><td colspan="4">No users yet.</td></tr>{% endfor %}</tbody></table></div>
+</div></div>{% endblock %}

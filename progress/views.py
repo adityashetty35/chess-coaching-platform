@@ -3,12 +3,17 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django import forms
 from core.decorators import coach_required
+from core.permissions import ensure_assigned_student, role_for
+from core.models import UserRole
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from .models import ProgressEntry, Goal, SyllabusLesson, TestResult, FideRatingRecord, ScheduledTest
 from .forms import ProgressEntryForm, GoalForm, SyllabusLessonForm, TestResultForm, FideRatingRecordForm, ScheduledTestForm
 from students.models import Student
 
 @coach_required
 def progress_list(request, student_pk):
+    ensure_assigned_student(request.user, student_pk)
     student = get_object_or_404(Student, pk=student_pk)
     entries = ProgressEntry.objects.filter(student=student)
     return render(request, 'progress/list.html', {
@@ -19,6 +24,7 @@ def progress_list(request, student_pk):
 
 @coach_required
 def progress_form(request, student_pk, pk=None):
+    ensure_assigned_student(request.user, student_pk)
     student = get_object_or_404(Student, pk=student_pk)
     entry = get_object_or_404(ProgressEntry, pk=pk, student=student) if pk else None
     
@@ -42,6 +48,7 @@ def progress_form(request, student_pk, pk=None):
 @require_POST
 @coach_required
 def progress_delete(request, student_pk, pk):
+    ensure_assigned_student(request.user, student_pk)
     entry = get_object_or_404(ProgressEntry, pk=pk, student_id=student_pk)
     entry.delete()
     messages.success(request, 'Progress entry deleted.')
@@ -49,6 +56,7 @@ def progress_delete(request, student_pk, pk):
 
 @coach_required
 def goal_list(request, student_pk):
+    ensure_assigned_student(request.user, student_pk)
     student = get_object_or_404(Student, pk=student_pk)
     goals = Goal.objects.filter(student=student)
     return render(request, 'progress/goal_list.html', {
@@ -59,6 +67,7 @@ def goal_list(request, student_pk):
 
 @coach_required
 def goal_form(request, student_pk, pk=None):
+    ensure_assigned_student(request.user, student_pk)
     student = get_object_or_404(Student, pk=student_pk)
     goal = get_object_or_404(Goal, pk=pk, student=student) if pk else None
     
@@ -82,6 +91,7 @@ def goal_form(request, student_pk, pk=None):
 @require_POST
 @coach_required
 def goal_delete(request, student_pk, pk):
+    ensure_assigned_student(request.user, student_pk)
     goal = get_object_or_404(Goal, pk=pk, student_id=student_pk)
     goal.delete()
     messages.success(request, 'Goal deleted.')
@@ -90,11 +100,15 @@ def goal_delete(request, student_pk, pk):
 
 @coach_required
 def academy_records(request):
+    coach = role_for(request.user) == UserRole.COACH
+    students = Student.objects.filter(Q(classes__assigned_coach=request.user) |
+                                      Q(batch__classes__assigned_coach=request.user)).distinct() if coach else Student.objects.all()
     return render(request, 'progress/academy_records.html', {
         'lessons': SyllabusLesson.objects.all(),
-        'tests': TestResult.objects.select_related('student')[:40],
-        'ratings': FideRatingRecord.objects.select_related('student', 'verified_by')[:40],
-        'scheduled_tests': ScheduledTest.objects.select_related('batch').all()[:40],
+        'tests': TestResult.objects.filter(student__in=students).select_related('student')[:40],
+        'ratings': FideRatingRecord.objects.filter(student__in=students).select_related('student', 'verified_by')[:40],
+        'scheduled_tests': ScheduledTest.objects.filter(batch__classes__assigned_coach=request.user).distinct()[:40]
+            if coach else ScheduledTest.objects.select_related('batch').all()[:40],
     })
 
 
@@ -111,7 +125,16 @@ def academy_record_form(request, kind, pk=None):
         raise Http404()
     model, form_class = config[kind]
     instance = get_object_or_404(model, pk=pk) if pk else None
+    if role_for(request.user) == UserRole.COACH:
+        if kind in ('fide', 'schedule'):
+            raise PermissionDenied('Verification and academy-wide test scheduling require an administrator.')
+        if instance and kind == 'test':
+            ensure_assigned_student(request.user, instance.student_id)
     form = form_class(request.POST or None, instance=instance)
+    if role_for(request.user) == UserRole.COACH and kind == 'test':
+        allowed = Student.objects.filter(Q(classes__assigned_coach=request.user) |
+                                         Q(batch__classes__assigned_coach=request.user)).distinct()
+        form.fields['student'].queryset = allowed
     if request.method == 'POST' and form.is_valid():
         record = form.save(commit=False)
         if kind == 'fide' and not pk:

@@ -1,0 +1,5 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}<div class="card border-0 shadow-sm" style="max-width:750px"><div class="card-body p-4"><p class="text-muted">{{ help }}</p><form method="post">{% csrf_token %}
+{% for field in form %}<div class="mb-3">{% if field.field.widget.input_type == 'checkbox' %}<label class="form-check">{{ field }} {{ field.label }}</label>{% else %}<label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>{{ field }}{% endif %}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}</div>{% endfor %}
+<button class="btn btn-primary" type="submit">Save</button> <a class="btn btn-outline-secondary" href="{% url 'administration:integrations' %}">Cancel</a></form></div></div>{% endblock %}

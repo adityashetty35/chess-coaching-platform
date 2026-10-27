@@ -1,6 +1,9 @@
 from django.db import models
+from django.conf import settings
 
 class Assignment(models.Model):
+    assigned_coach = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                       on_delete=models.SET_NULL, related_name='assigned_homework')
     STATUS_CHOICES = [
         ('assigned', 'Assigned'),
         ('in_progress', 'In Progress'),

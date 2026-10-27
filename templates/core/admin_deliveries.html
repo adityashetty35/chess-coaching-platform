@@ -1,0 +1,4 @@
+{% extends 'base_admin.html' %}
+{% block page_title %}WhatsApp delivery logs{% endblock %}
+{% block content %}<div class="card border-0 shadow-sm"><div class="card-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Time</th><th>Recipient</th><th>Invoice</th><th>Status</th><th>Provider ID / error</th></tr></thead><tbody>
+{% for entry in records %}<tr><td>{{ entry.created_at|date:'d M Y H:i' }}</td><td>{{ entry.recipient }}</td><td>{{ entry.invoice_id|default:'—' }}</td><td>{{ entry.status }}</td><td><small>{{ entry.provider_id }} {{ entry.error }}</small></td></tr>{% empty %}<tr><td colspan="5" class="text-muted">No messages have been attempted.</td></tr>{% endfor %}</tbody></table></div></div></div>{% endblock %}

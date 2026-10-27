@@ -4,9 +4,12 @@
 <div class="card"><div class="card-body">
   <form method="post" enctype="multipart/form-data">{% csrf_token %}
     {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
-    <h5 class="mb-3">Contact details</h5>
+    <h5 class="mb-3">Academy information &amp; contact details</h5>
     <p class="text-muted">The public course structure and fees are fixed to the academy brief. Update the contact information here.</p>
     <div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Academy name</label>{{ form.academy_name }}{{ form.academy_name.errors }}</div>
+      <div class="col-md-6"><label class="form-label">Head coach</label>{{ form.coach_name }}{{ form.coach_name.errors }}</div>
+      <div class="col-12"><label class="form-label">Tagline</label>{{ form.tagline }}{{ form.tagline.errors }}</div>
       <div class="col-md-6"><label class="form-label">Email</label>{{ form.email }}{{ form.email.errors }}</div>
       <div class="col-md-6"><label class="form-label">Phone</label>{{ form.phone }}{{ form.phone.errors }}</div>
       <div class="col-md-6"><label class="form-label">WhatsApp</label>{{ form.whatsapp }}{{ form.whatsapp.errors }}</div>

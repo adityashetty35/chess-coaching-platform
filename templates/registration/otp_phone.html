@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Parent SMS login{% endblock %}
+{% block body_class %}login-page{% endblock %}
+{% block body %}<div class="login-card"><div class="text-center mb-4"><div class="login-mark">♔</div><h2>Parent sign in</h2><p class="login-subtitle">Receive a one-time code on your registered number.</p></div>
+{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}
+<form method="post">{% csrf_token %}<label class="form-label" for="phone">Mobile number with country code</label><input class="form-control mb-3" type="tel" name="phone" id="phone" placeholder="+919876543210" autocomplete="tel" required><button class="btn btn-primary w-100" type="submit">Send verification code</button></form>
+<div class="text-center mt-3"><a href="{% url 'accounts:login' %}">Use password instead</a></div></div>{% endblock %}

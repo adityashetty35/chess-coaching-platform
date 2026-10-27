@@ -29,7 +29,7 @@ class SiteSettingsForm(forms.ModelForm):
 
 class AcademySettingsForm(SiteSettingsForm):
     class Meta(SiteSettingsForm.Meta):
-        fields = ['email', 'phone', 'whatsapp', 'address', 'fee_reminder_template']
+        fields = ['academy_name', 'coach_name', 'tagline', 'email', 'phone', 'whatsapp', 'address', 'fee_reminder_template']
         exclude = []
 
 class CoachingServiceForm(forms.ModelForm):

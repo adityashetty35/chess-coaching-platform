@@ -30,6 +30,7 @@
         <button type="submit" class="btn btn-primary w-100 btn-lg">Log in</button>
         <input type="hidden" name="next" value="{{ next }}">
     </form>
+    <div class="text-center mt-3"><a href="{% url 'accounts:otp_login' %}">Parent login with SMS OTP</a></div>
 
     <div class="text-center mt-4">
         <a href="{% url 'website:home' %}" class="text-muted text-decoration-none small">

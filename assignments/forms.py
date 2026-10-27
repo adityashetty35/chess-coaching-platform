@@ -6,7 +6,7 @@ from coaching.models import Batch
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'due_date', 'students', 'batch', 'coach_notes']
+        fields = ['title', 'description', 'due_date', 'students', 'batch', 'assigned_coach', 'coach_notes']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 4}),
