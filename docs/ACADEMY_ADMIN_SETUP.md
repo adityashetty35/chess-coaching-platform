@@ -1,6 +1,6 @@
 # Academy administration, WhatsApp, OTP, audit
 
-This change is local only; it has **not** been pushed to GitHub or deployed.
+These features require database migrations and provider configuration before they can be used on a deployed site.
 
 ## Apply safely when ready
 
